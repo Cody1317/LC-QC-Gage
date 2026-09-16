@@ -1,0 +1,1279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LaserCraft QC">
+<meta name="format-detection" content="telephone=no">
+<title>LaserCraft Technologies QC</title>
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LaserCraft QC">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<style>
+:root{
+  --navy:#111111; --blue:#b00000; --green:#111111; --green2:#f4dddd;
+  --orange:#b00000; --orange2:#f8e1e1; --red:#b00000; --bg:#eeeeee;
+  --card:#fff; --text:#111111; --muted:#555555; --line:#c7c7c7;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:#111111;color:white;border-bottom:5px solid #b00000;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+header h1{font-size:22px;margin:0}
+header small{opacity:.85}
+main{max-width:1180px;margin:0 auto;padding:20px}
+.screen{display:none}.screen.active{display:block}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:18px}
+.action{border:0;border-radius:16px;padding:42px 20px;font-size:30px;font-weight:800;cursor:pointer;min-height:150px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.action.out{background:#b00000;color:#ffffff}
+.action.in{background:#111111;color:#ffffff}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card .n{font-size:30px;font-weight:800;margin-top:4px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+button,.btn{font:inherit}
+.btn{border:1px solid var(--line);background:white;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:600}
+.btn.primary{background:var(--blue);color:white;border-color:var(--blue)}
+.btn.good{background:var(--green);color:white;border-color:var(--green)}
+.btn.warn{background:var(--orange);color:white;border-color:var(--orange)}
+.btn.danger{background:var(--red);color:white;border-color:var(--red)}
+.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:16px}
+.panel h2{margin:0 0 6px}.muted{color:var(--muted)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+label{font-weight:700}
+input,select,textarea{width:100%;padding:12px;border:1px solid #bfc9d2;border-radius:9px;font-size:16px;background:white}
+textarea{min-height:90px;resize:vertical}
+.gaugeinfo{margin-top:10px;padding:12px;border-radius:10px;background:#f3f3f3;border:1px solid #cccccc;display:none}
+.message{margin-top:14px;padding:12px;border-radius:10px;display:none;font-weight:700}
+.message.ok{display:block;background:var(--green2);color:#225d36;border:1px solid #b9ddc3}
+.message.err{display:block;background:#fde9e7;color:#822320;border:1px solid #efc1bd}
+.navrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}
+th{background:#dddddd;position:sticky;top:0}
+.tablewrap{overflow:auto;max-height:460px;border:1px solid var(--line);border-radius:10px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:800}
+.badge.out{background:#f4dddd;color:#8b0000}.badge.in{background:#dddddd;color:#111111}
+.badge.over{background:#fde9e7;color:#8a2420}
+.stats-note{font-size:13px;color:var(--muted);margin-top:8px}
+.employee-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+
+.barcode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.barcode-label{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center;break-inside:avoid}
+.barcode-label .gid{font-weight:800;font-size:14px;margin-top:4px}
+.barcode-label .gname{font-size:11px;color:var(--muted);margin-top:3px;min-height:28px}
+.barcode-label svg{width:100%;height:58px}
+.scan-ok{background:#e7f4ea!important;border-color:#2f7d4a!important}
+.scan-bad{background:#fde9e7!important;border-color:#a12a2a!important}
+@media print{
+  header,.navrow,.toolbar,.muted{display:none!important}
+  body,main,.panel{background:white!important;margin:0!important;padding:0!important;border:0!important}
+  .screen{display:none!important}
+  #labels{display:block!important}
+  .barcode-grid{grid-template-columns:repeat(3,1fr);gap:6px}
+  .barcode-label{border:1px solid #000;border-radius:0;padding:6px;page-break-inside:avoid}
+}
+@media(max-width:780px){
+  .hero,.cards,.formgrid{grid-template-columns:1fr}
+  .field.full{grid-column:auto}
+  header{align-items:flex-start;flex-direction:column}
+  .action{font-size:26px;min-height:120px}
+}
+
+/* LaserCraft shop-floor visual polish */
+body{background:#ededed}
+header{
+  position:relative;
+  min-height:104px;
+  display:grid !important;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  padding:14px 28px !important;
+}
+header .brand{
+  grid-column:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  text-align:left;
+}
+.brand-logo{
+  width:96px;
+  max-height:76px;
+  object-fit:contain;
+  display:block;
+  border-radius:8px;
+}
+.brand-copy h1,.brand h1{margin:0;text-align:center}
+.brand-copy .sub,.brand .sub{text-align:center}
+header > div:last-child{
+  grid-column:3;
+  justify-self:end;
+}
+main{
+  max-width:1120px !important;
+  margin:0 auto !important;
+  padding:24px 22px 40px !important;
+}
+.screen > .navrow{
+  max-width:1080px;
+  margin:0 auto 14px;
+}
+.screen > .panel{
+  max-width:1080px;
+  margin-left:auto;
+  margin-right:auto;
+}
+#home .panel{text-align:center;padding:28px}
+#home .hero,#home .cards,#home .toolbar{justify-content:center}
+#home .hero{max-width:850px;margin:12px auto 20px}
+#home .cards{max-width:950px;margin-left:auto;margin-right:auto}
+#home .toolbar{display:flex}
+.card{text-align:center}
+.card .n{text-align:center}
+.panel h2,.panel > h3{text-align:center}
+.navrow{display:grid !important;grid-template-columns:1fr auto 1fr;align-items:center}
+.navrow h2{grid-column:2;margin:0;text-align:center}
+.navrow > .btn:first-child{grid-column:1;justify-self:start}
+.formgrid{max-width:900px;margin-left:auto;margin-right:auto}
+.message{max-width:900px;margin-left:auto;margin-right:auto}
+.tablewrap{margin-left:auto;margin-right:auto}
+#checkout .panel,#checkin .panel{max-width:900px}
+#checkout .toolbar,#checkin .toolbar{justify-content:center}
+#adminlogin .panel,#changepin .panel{box-shadow:0 6px 24px rgba(0,0,0,.10)}
+#adminhome .cards{justify-content:center}
+button,.btn,input,select,textarea{min-height:44px}
+@media(max-width:760px){
+  header{grid-template-columns:1fr !important;text-align:center;padding:12px 14px !important}
+  header .brand{grid-column:1;flex-direction:column;gap:6px}
+  header > div:last-child{grid-column:1;justify-self:center;margin-top:8px}
+  .brand-logo{width:88px;max-height:66px}
+  main{padding:16px 10px 30px !important}
+  .navrow{grid-template-columns:1fr !important;gap:10px}
+  .navrow h2{grid-column:1;grid-row:1}
+  .navrow > .btn:first-child{grid-column:1;grid-row:2;justify-self:center}
+  #home .panel{padding:18px 12px}
+}
+
+
+.lasercraft-footer{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:28px 20px 42px;
+  min-height:190px;
+}
+.footer-logo{
+  width:min(360px,70vw);
+  max-height:170px;
+  object-fit:contain;
+  display:block;
+  opacity:.96;
+}
+@media(max-width:760px){
+  .lasercraft-footer{min-height:150px;padding:20px 10px 30px}
+  .footer-logo{width:min(300px,78vw);max-height:135px}
+}
+
+
+#home .cards{
+  grid-template-columns:repeat(3,minmax(180px,1fr)) !important;
+  max-width:780px !important;
+  margin:18px auto !important;
+  justify-content:center;
+}
+@media(max-width:760px){
+  #home .cards{grid-template-columns:1fr !important;max-width:420px !important}
+}
+
+
+/* Blend the page background with the white logo background */
+html,body{
+  background:#ffffff !important;
+}
+main{
+  background:#ffffff !important;
+}
+.lasercraft-footer{
+  background:#ffffff !important;
+}
+.footer-logo{
+  background:#ffffff;
+  border:none !important;
+  box-shadow:none !important;
+}
+
+
+/* iPad / iOS Safari compatibility */
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+header{padding-top:max(14px,env(safe-area-inset-top)) !important}
+button,.btn,input,select,textarea{-webkit-appearance:none;appearance:none;border-radius:10px}
+button,.btn{touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,.08)}
+input,select,textarea{font-size:16px !important}
+.tablewrap{-webkit-overflow-scrolling:touch}
+@supports (-webkit-touch-callout:none){.action,.btn{cursor:default}input[type=file]{font-size:16px !important}}
+
+</style>
+</head>
+<body>
+<header>
+  <div><img class="brand-logo" src="data:image/png;base64,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" alt="LaserCraft Technologies logo"><h1>LaserCraft Technologies QC</h1><small>Employee check-in / check-out with barcode scanning</small></div>
+  <div style="display:flex;align-items:center;gap:10px"><div id="clock"></div><button class="btn" id="adminModeBtn" type="button">QC / ADMIN</button></div>
+<div id="cloudStatus" style="text-align:center;font-weight:800;padding:6px;color:#555">Connecting to shared gauge database…</div></header>
+<main>
+<section id="home" class="screen active">
+  <div class="panel">
+    <h2>What would you like to do?</h2>
+    <p class="muted">Click a button below. The system will only show gauges that are valid for that action.</p>
+    <div class="hero">
+      <button class="action out" id="goOut">CHECK OUT</button>
+      <button class="action in" id="goIn">CHECK IN</button>
+    </div>
+    <div class="cards">
+      <div class="card"><div>Total gauges</div><div class="n" id="totalCount">0</div></div>
+      <div class="card"><div>Available</div><div class="n" id="availCount">0</div></div>
+      <div class="card" id="checkedOutCard" style="cursor:pointer"><div>Checked out</div><div class="n" id="outCount">0</div><div class="stats-note">Click to review</div></div>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="employeeHistoryBtn" type="button">Currently Checked Out</button>
+      <button class="btn" id="employeeTransactionsBtn" type="button">Transaction History</button>
+    </div>
+    <div class="stats-note">Employee mode is for check in and check out only. QC/Admin tools are PIN protected.</div>
+  </div>
+</section>
+
+
+
+<section id="employeehistory" class="screen">
+  <div class="navrow"><button class="btn" data-home>← Dashboard</button><h2>Transaction History</h2></div>
+  <div class="panel">
+    <p class="muted">Read-only transaction history for employees.</p>
+    <div class="field"><label>Search history</label><input id="employeeHistorySearch" placeholder="Gauge, employee, department..."></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>Date / Time</th><th>Action</th><th>Gauge</th><th>Description</th><th>Employee</th><th>Department</th><th>Condition / Notes</th>
+        </tr></thead>
+        <tbody id="employeeHistoryBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="adminlogin" class="screen">
+  <div class="panel" style="max-width:520px;margin:30px auto">
+    <h2>QC / Admin Login</h2>
+    <p class="muted">Enter the admin PIN to access QC / Admin tools.</p>
+    <form id="adminLoginForm">
+      <div class="field"><label>Admin PIN</label><input id="adminPinInput" type="password" inputmode="numeric" autocomplete="off" required></div>
+      <div class="toolbar"><button class="btn primary" type="submit">Unlock Admin Mode</button><button class="btn" data-home type="button">Cancel</button></div>
+      <div id="adminLoginMsg" class="message"></div>
+    </form>
+  </div>
+</section>
+
+<section id="adminhome" class="screen">
+  <div class="navrow"><button class="btn" id="exitAdminBtn" type="button">← Employee Mode</button><h2>QC / Admin Mode</h2></div>
+  <div class="panel">
+    <div class="cards">
+      <div class="card" id="adminPastDueCard" style="cursor:pointer"><div>Calibration Past Due</div><div class="n" id="adminPastDueCount">0</div><div class="stats-note">Click to review</div></div>
+      <div class="card" id="adminDueSoonCard" style="cursor:pointer"><div>Due ≤ 30 Days</div><div class="n" id="adminDueSoonCount">0</div><div class="stats-note">Click to review</div></div>
+      <div class="card" id="adminCheckedOutCard" style="cursor:pointer"><div>Checked Out</div><div class="n" id="adminCheckedOutCount">0</div><div class="stats-note">Click to review</div></div>
+      <div class="card" id="adminMissingLocationCard" style="cursor:pointer"><div>Location Not Set</div><div class="n" id="adminMissingLocationCount">0</div><div class="stats-note">Click to update</div></div>
+      <div class="card" id="adminInventoryCard" style="cursor:pointer"><div>Gauge Setup</div><div class="n">SET</div><div class="stats-note">Category / storage location</div></div>
+      <div class="card" id="adminImportCard" style="cursor:pointer"><div>Import / Update Gauges</div><div class="n">XLS</div><div class="stats-note">Load Excel or CSV</div></div>
+      <div class="card" id="adminDocsCard" style="cursor:pointer"><div>Calibration Documents</div><div class="n">DOC</div><div class="stats-note">Upload certificate by gauge</div></div>
+      <div class="card" id="adminLabelsCard" style="cursor:pointer"><div>Barcode Labels</div><div class="n">|||</div><div class="stats-note">Print gauge labels</div></div>
+      <div class="card" id="adminEmployeesCard" style="cursor:pointer"><div>Employee Setup</div><div class="n">EMP</div><div class="stats-note">Manage employee list</div></div>
+      <div class="card" id="adminHistoryCard" style="cursor:pointer"><div>Transaction History</div><div class="n">LOG</div><div class="stats-note">Review / delete history</div></div>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="adminExportBtn" type="button">Export Transactions CSV</button>
+      <button class="btn" id="adminBackupBtn" type="button">Backup Data</button>
+      <label class="btn" for="adminRestoreFile" style="cursor:pointer">Restore Backup</label>
+      <input id="adminRestoreFile" type="file" accept=".json" hidden>
+      <button class="btn danger" id="changePinBtn" type="button">Change Admin PIN</button>
+    </div>
+  </div>
+</section>
+
+<section id="changepin" class="screen">
+  <div class="panel" style="max-width:520px;margin:30px auto">
+    <h2>Change Admin PIN</h2>
+    <form id="changePinForm">
+      <div class="field"><label>Current PIN</label><input id="currentPin" type="password" inputmode="numeric" required></div>
+      <div class="field"><label>New PIN</label><input id="newPin" type="password" inputmode="numeric" minlength="4" required></div>
+      <div class="field"><label>Confirm New PIN</label><input id="confirmPin" type="password" inputmode="numeric" minlength="4" required></div>
+      <div class="toolbar"><button class="btn primary" type="submit">Save New PIN</button><button class="btn" id="cancelPinChange" type="button">Cancel</button></div>
+      <div id="pinChangeMsg" class="message"></div>
+    </form>
+  </div>
+</section>
+
+<section id="checkout" class="screen">
+  <div class="navrow"><button class="btn" data-home>← Dashboard</button><span class="badge out">CHECK OUT</span></div>
+  <div class="panel">
+    <h2>Check Out a Gauge</h2>
+    <p class="muted">Select your name and the gauge you are taking.</p>
+    <form id="checkoutForm">
+      <div class="formgrid">
+        <div class="field full"><label>Scan Gauge Barcode</label><input id="outScan" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" enterkeyhint="done" placeholder="Tap here, scan barcode, then press Enter"></div>
+        <div class="field"><label>Employee</label><select id="outEmployee" required></select></div>
+        <div class="field"><label>Department</label><input id="outDept" placeholder="e.g. Production"></div>
+        <div class="field full"><label>Gauge</label><select id="outGauge" required></select><div class="gaugeinfo" id="outInfo"></div></div>
+        <div class="field full"><label>Notes</label><textarea id="outNotes" placeholder="Optional"></textarea></div>
+      </div>
+      <div class="toolbar"><button class="btn warn" type="submit">Confirm Check Out</button></div>
+      <div id="outMsg" class="message"></div>
+    </form>
+  </div>
+</section>
+
+<section id="checkin" class="screen">
+  <div class="navrow"><button class="btn" data-home>← Dashboard</button><span class="badge in">CHECK IN</span></div>
+  <div class="panel">
+    <h2>Check In a Gauge</h2>
+    <p class="muted">Only gauges currently checked out appear here.</p>
+    <form id="checkinForm">
+      <div class="formgrid">
+        <div class="field full"><label>Scan Gauge Barcode</label><input id="inScan" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" enterkeyhint="done" placeholder="Tap here, scan barcode, then press Enter"></div>
+        <div class="field"><label>Employee</label><select id="inEmployee" required></select></div>
+        <div class="field"><label>Condition</label>
+          <select id="inCondition"><option>Good</option><option>Needs Cleaning</option><option>Damaged</option><option>Missing</option></select>
+        </div>
+        <div class="field full"><label>Gauge</label><select id="inGauge" required></select><div class="gaugeinfo" id="inInfo"></div></div>
+        <div class="field full"><label>Return Note / Location</label><textarea id="inNotes" placeholder="Optional"></textarea></div>
+      </div>
+      <div class="toolbar"><button class="btn good" type="submit">Confirm Check In</button></div>
+      <div id="inMsg" class="message"></div>
+    </form>
+  </div>
+</section>
+
+
+<section id="checkedout" class="screen">
+  <div class="navrow"><button class="btn" data-home>← Dashboard</button><h2>Currently Checked Out</h2></div>
+  <div class="panel">
+    <p class="muted">This list shows gauges that are checked out right now, based on the latest transaction for each gauge.</p>
+    <div class="card" style="max-width:220px"><div>Checked Out Now</div><div class="n" id="checkedOutReviewCount">0</div></div>
+    <div class="tablewrap" style="margin-top:16px">
+      <table>
+        <thead><tr>
+          <th>Gauge ID</th><th>Description</th><th>Employee</th><th>Department</th><th>Checked Out Date / Time</th><th>Notes</th>
+        </tr></thead>
+        <tbody id="checkedOutBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="history" class="screen">
+  <div class="navrow"><button class="btn admin-back" type="button">← Admin Dashboard</button><h2>Transaction History</h2></div>
+  <div class="panel">
+    <div class="field"><label>Search history</label><input id="historySearch" placeholder="Gauge, employee, job, department..."></div>
+    <div class="toolbar" style="margin-top:12px">
+      <button class="btn danger" id="historyClearBtn" type="button">Delete Transaction History</button>
+    </div>
+
+    <div class="tablewrap"><table><thead><tr>
+      <th>Date / Time</th><th>Action</th><th>Gauge</th><th>Description</th><th>Employee</th><th>Department</th><th>Condition / Notes</th>
+    </tr></thead><tbody id="historyBody"></tbody></table></div>
+  </div>
+</section>
+
+
+
+
+
+<section id="gaugeimport" class="screen">
+  <div class="navrow"><button class="btn admin-back" type="button">← Admin Dashboard</button><h2>Import / Update Gauges</h2></div>
+  <div class="panel">
+    <p class="muted">Load an Excel or CSV calibration list. Gauges are matched by Gauge ID. Existing checkout history, storage locations, categories, and calibration documents are preserved unless the spreadsheet provides a replacement value.</p>
+    <div class="formgrid">
+      <div class="field full">
+        <label>Gauge Spreadsheet</label>
+        <input id="gaugeImportFile" type="file" accept=".xlsx,.xls,.csv">
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="btn primary" id="previewGaugeImport" type="button">Preview Import</button>
+      <button class="btn" id="applyGaugeImport" type="button" disabled>Apply Updates</button>
+    </div>
+    <div id="gaugeImportMsg" class="message"></div>
+    <div id="importSummary" class="cards" style="display:none;grid-template-columns:repeat(4,minmax(140px,1fr));max-width:850px;margin:18px auto">
+      <div class="card"><div>Rows Read</div><div class="n" id="importRows">0</div></div>
+      <div class="card"><div>Matched</div><div class="n" id="importMatched">0</div></div>
+      <div class="card"><div>Will Update</div><div class="n" id="importUpdated">0</div></div>
+      <div class="card"><div>New Gauges</div><div class="n" id="importNew">0</div></div>
+    </div>
+    <div class="tablewrap" id="importPreviewWrap" style="display:none;margin-top:16px">
+      <table>
+        <thead><tr><th>Action</th><th>Gauge ID</th><th>Description</th><th>Department</th><th>Last Calibration</th><th>Calibration Due</th><th>Technician</th></tr></thead>
+        <tbody id="importPreviewBody"></tbody>
+      </table>
+    </div>
+    <p class="stats-note">Recognized columns include Gauge/Gage ID or Number, Gauge/Gage Name or Description, Department, Last Calibration, Planned Calibration or Calibration Due, Technician, Category, and Storage Location.</p>
+  </div>
+</section>
+
+<section id="gaugesetup" class="screen">
+  <div class="navrow"><button class="btn admin-back" type="button">← Admin Dashboard</button><h2>Gauge Setup</h2></div>
+  <div class="panel">
+    <p class="muted">Use this screen to maintain gauge categories and storage locations. Changes are saved on this kiosk.</p>
+    <div class="field"><label>Search Gauge</label><input id="setupSearch" placeholder="Gauge ID, description, department..."></div>
+    <div class="tablewrap" style="margin-top:14px">
+      <table>
+        <thead><tr><th>Gauge ID</th><th>Description</th><th>Category</th><th>Storage Location</th><th>Calibration Due</th><th>Save</th></tr></thead>
+        <tbody id="setupBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="calibration" class="screen">
+  <div class="navrow"><button class="btn admin-back" type="button">← Admin Dashboard</button><h2>Calibration Status</h2></div>
+  <div class="panel">
+    <div class="toolbar">
+      <button class="btn danger cal-filter" data-filter="past">Past Due</button>
+      <button class="btn warn cal-filter" data-filter="soon">Due Within 30 Days</button>
+      <button class="btn cal-filter" data-filter="all">All Calibrations</button>
+    </div>
+    <div class="cards" style="grid-template-columns:repeat(3,1fr)">
+      <div class="card"><div>Past Due</div><div class="n" id="calPastCount">0</div></div>
+      <div class="card"><div>Due ≤ 30 Days</div><div class="n" id="calSoonCount">0</div></div>
+      <div class="card"><div>Total With Due Date</div><div class="n" id="calTotalCount">0</div></div>
+    </div>
+    <div class="tablewrap" style="margin-top:16px">
+      <table>
+        <thead><tr>
+          <th>Status</th><th>Gauge ID</th><th>Description</th><th>Category</th><th>Storage Location</th><th>Department</th>
+          <th>Last Calibration</th><th>Calibration Due</th><th>Technician</th>
+        </tr></thead>
+        <tbody id="calBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section id="documents" class="screen">
+  <div class="navrow"><button class="btn admin-back" type="button">← Admin Dashboard</button><h2>Calibration Documents</h2></div>
+  <div class="panel">
+    <p class="muted">Choose a gauge and attach its calibration certificate or related QC document. Documents are stored on this kiosk in the browser.</p>
+    <div class="formgrid">
+      <div class="field full"><label>Gauge</label><select id="docGauge"></select></div>
+      <div class="field full"><label>Upload Document</label><input id="docFile" type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"></div>
+    </div>
+    <div class="toolbar"><button class="btn primary" id="uploadDocBtn" type="button">Save Document to Gauge</button></div>
+    <div id="docMsg" class="message"></div>
+    <div class="tablewrap" style="margin-top:16px">
+      <table><thead><tr><th>Gauge</th><th>Document</th><th>Uploaded</th><th>Open</th><th>Delete</th></tr></thead><tbody id="docBody"></tbody></table>
+    </div>
+  </div>
+</section>
+
+<section id="labels" class="screen">
+  <div class="navrow"><button class="btn admin-back" type="button">← Admin Dashboard</button><h2>Printable Gauge Barcode Labels</h2></div>
+  <div class="panel">
+    <p class="muted">Each label uses the Gauge ID as its barcode value. Print this page and attach the matching label to each gauge.</p>
+    <div class="toolbar">
+      <button class="btn primary" id="printLabels" type="button">Print Barcode Labels</button>
+    </div>
+    <div id="barcodeGrid" class="barcode-grid"></div>
+  </div>
+</section>
+
+<section id="settings" class="screen">
+  <div class="navrow"><button class="btn admin-back" type="button">← Admin Dashboard</button><h2>Employee / Admin Setup</h2></div>
+  <div class="panel">
+    <h3>Employee pull-down list</h3>
+    <p class="muted">The active employee roster is preloaded. You can still add or remove names locally on this kiosk.</p>
+    <div class="employee-row"><input id="newEmployee" placeholder="Employee name"><button class="btn primary" id="addEmployee" type="button">Add</button></div>
+    <div id="employeeList" class="toolbar"></div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:22px 0">
+    <h3>Administrative actions</h3>
+    <div class="toolbar">
+      
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="lasercraft-footer">
+  <img class="footer-logo" src="data:image/png;base64,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" alt="LaserCraft Technologies logo">
+</footer>
+
+
+<script src="./xlsx.full.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'"></script>
+<script>
+
+
+const DOC_DB="qcGaugeDocsDB", DOC_STORE="docs";
+function openDocDb(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(DOC_DB,1);
+    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(DOC_STORE)){const s=db.createObjectStore(DOC_STORE,{keyPath:"id",autoIncrement:true});s.createIndex("gaugeId","gaugeId");}};
+    req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
+  });
+}
+async function addGaugeDoc(gaugeId,file){
+  const db=await openDocDb();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(DOC_STORE,"readwrite");
+    tx.objectStore(DOC_STORE).add({gaugeId,name:file.name,type:file.type||"application/octet-stream",uploaded:new Date().toISOString(),blob:file});
+    tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+  });
+}
+async function listGaugeDocs(){
+  const db=await openDocDb();
+  return new Promise((resolve,reject)=>{
+    const req=db.transaction(DOC_STORE,"readonly").objectStore(DOC_STORE).getAll();
+    req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);
+  });
+}
+async function deleteGaugeDoc(id){
+  const db=await openDocDb();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(DOC_STORE,"readwrite");tx.objectStore(DOC_STORE).delete(id);
+    tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+  });
+}
+async function renderDocuments(){
+  const sel=document.getElementById("docGauge"); if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">Select gauge...</option>';
+  GAUGES.forEach(g=>{const o=document.createElement("option");o.value=g.id;o.textContent=`${g.id} — ${g.name}`;sel.appendChild(o)});
+  if([...sel.options].some(o=>o.value===cur))sel.value=cur;
+  const body=document.getElementById("docBody");body.innerHTML="";
+  try{
+    const docs=await listGaugeDocs();
+    docs.sort((a,b)=>b.uploaded.localeCompare(a.uploaded)).forEach(d=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${d.gaugeId}</td><td>${d.name}</td><td>${fmt(d.uploaded)}</td><td></td><td></td>`;
+      const openBtn=document.createElement("button");openBtn.className="btn";openBtn.textContent="Open";openBtn.type="button";
+      openBtn.addEventListener("click",()=>{const u=URL.createObjectURL(d.blob);window.open(u,"_blank");setTimeout(()=>URL.revokeObjectURL(u),60000)});
+      const delBtn=document.createElement("button");delBtn.className="btn danger";delBtn.textContent="Delete";delBtn.type="button";
+      delBtn.addEventListener("click",async()=>{if(!adminUnlocked){show("adminlogin");return;}if(confirm(`Delete ${d.name}?`)){await deleteGaugeDoc(d.id);renderDocuments();}});
+      tr.children[3].appendChild(openBtn);tr.children[4].appendChild(delBtn);body.appendChild(tr);
+    });
+  }catch(e){body.innerHTML='<tr><td colspan="5">Document storage is not available in this browser.</td></tr>';}
+}
+
+const CODE39 = {
+"0":"nnnwwnwnn","1":"wnnwnnnnw","2":"nnwwnnnnw","3":"wnwwnnnnn","4":"nnnwwnnnw",
+"5":"wnnwwnnnn","6":"nnwwwnnnn","7":"nnnwnnwnw","8":"wnnwnnwnn","9":"nnwwnnwnn",
+"A":"wnnnnwnnw","B":"nnwnnwnnw","C":"wnwnnwnnn","D":"nnnnwwnnw","E":"wnnnwwnnn",
+"F":"nnwnwwnnn","G":"nnnnnwwnw","H":"wnnnnwwnn","I":"nnwnnwwnn","J":"nnnnwwwnn",
+"K":"wnnnnnnww","L":"nnwnnnnww","M":"wnwnnnnwn","N":"nnnnwnnww","O":"wnnnwnnwn",
+"P":"nnwnwnnwn","Q":"nnnnnnwww","R":"wnnnnnwwn","S":"nnwnnnwwn","T":"nnnnwnwwn",
+"U":"wwnnnnnnw","V":"nwwnnnnnw","W":"wwwnnnnnn","X":"nwnnwnnnw","Y":"wwnnwnnnn",
+"Z":"nwwnwnnnn","-":"nwnnnnwnw",".":"wwnnnnwnn"," ":"nwwnnnwnn","$":"nwnwnwnnn",
+"/":"nwnwnnnwn","+":"nwnnnwnwn","%":"nnnwnwnwn","*":"nwnnwnwnn"
+};
+function normalizeCode39(s){
+  return String(s||"").toUpperCase().split("").filter(ch=>CODE39[ch]).join("");
+}
+function code39Svg(value){
+  const v=normalizeCode39(value);
+  const data="*"+v+"*";
+  const narrow=2, wide=5, gap=2, h=48;
+  let x=0, bars=[];
+  for(let ci=0;ci<data.length;ci++){
+    const pat=CODE39[data[ci]];
+    for(let i=0;i<9;i++){
+      const w=pat[i]==="w"?wide:narrow;
+      if(i%2===0) bars.push(`<rect x="${x}" y="0" width="${w}" height="${h}" fill="#000"/>`);
+      x+=w;
+    }
+    if(ci<data.length-1) x+=gap;
+  }
+  return `<svg viewBox="0 0 ${x} ${h}" xmlns="http://www.w3.org/2000/svg" aria-label="Barcode ${v}">${bars.join("")}</svg>`;
+}
+function renderBarcodeLabels(){
+  const grid=document.getElementById("barcodeGrid");
+  if(!grid) return;
+  grid.innerHTML="";
+  GAUGES.forEach(g=>{
+    const div=document.createElement("div");
+    div.className="barcode-label";
+    div.innerHTML=code39Svg(g.id)+`<div class="gid">${g.id}</div><div class="gname">${g.name||""}</div>`;
+    grid.appendChild(div);
+  });
+}
+function flashScan(el,ok){
+  el.classList.remove("scan-ok","scan-bad");
+  void el.offsetWidth;
+  el.classList.add(ok?"scan-ok":"scan-bad");
+  setTimeout(()=>el.classList.remove("scan-ok","scan-bad"),900);
+}
+function processScan(mode){
+  const scan=document.getElementById(mode==="out"?"outScan":"inScan");
+  const sel=document.getElementById(mode==="out"?"outGauge":"inGauge");
+  const raw=normalizeGaugeId(scan.value);
+  if(!raw) return;
+  const g=byId(raw);
+  if(!g){flashScan(scan,false);scan.select();return;}
+  const valid=mode==="out"?(!isOut(g.id)&&!duePast(g)):isOut(g.id);
+  if(!valid){flashScan(scan,false);scan.select();return;}
+  sel.value=g.id;
+  sel.dispatchEvent(new Event("change"));
+  flashScan(scan,true);
+  scan.value="";
+  document.getElementById(mode==="out"?"outEmployee":"inEmployee").focus();
+}
+
+const GAUGES = [{"id": "OM1303030E", "name": "Robot Power Source", "department": "Weld MIG", "lastCal": "12/07/2021", "due": "10/23/2022", "technician": "Andrea Alvarado"}, {"id": "MJ380195L", "name": "Power Source", "department": "Weld TIG", "lastCal": "10/21/2024", "due": "10/21/2025", "technician": "Andrea Alvarado"}, {"id": "ME385066U", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "10/21/2024", "due": "10/21/2025", "technician": "Andrea Alvarado"}, {"id": "M8X1.25-6H", "name": "Thread plug gage set GO/NOGO SIZE M8X1.25-6H", "department": "Quality", "lastCal": "11/09/2023", "due": "11/08/2025", "technician": "Andrea Alvarado"}, {"id": "NE320762C", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "04/03/2025", "due": "04/03/2026", "technician": "Andrea Alvarado"}, {"id": "NE321109U", "name": "Power Source", "department": "Weld TIG", "lastCal": "04/03/2025", "due": "04/03/2026", "technician": "Andrea Alvarado"}, {"id": "66-011648", "name": "Floor Scale", "department": "Shipping", "lastCal": "04/07/2025", "due": "04/07/2026", "technician": "Stephen Hein"}, {"id": "M55X2-6H", "name": "GO/NOGO Thread Plug Gage Size M55x2-6H", "department": "Quality", "lastCal": "04/08/2024", "due": "04/08/2026", "technician": "Andrea Alvarado"}, {"id": "MIT-0016", "name": "MIT-0016", "department": "Quality", "lastCal": "04/08/2024", "due": "04/08/2026", "technician": "Andrea Alvarado"}, {"id": "10-32 UNF-2B", "name": "Thread Plug Gage PD, GO/NOGO Nominal 10-32 UNF-2B", "department": "Quality", "lastCal": "04/08/2024", "due": "04/08/2026", "technician": "Andrea Alvarado"}, {"id": "LA00110BG007", "name": "Thread Plug Gage PD, GO/NOGO 7/16-24 UNS-2B", "department": "Quality", "lastCal": "04/08/2024", "due": "04/08/2026", "technician": "Andrea Alvarado"}, {"id": "5/8-11", "name": "Thread Plug Gage GO/NOGO 5/8-11 UNC-2B", "department": "Quality", "lastCal": "04/08/2024", "due": "04/08/2026", "technician": "Andrea Alvarado"}, {"id": "LA00125BG001", "name": "GO/NOGO Thread Plug Gage size M12.0x1.0-6G-6H", "department": "Quality", "lastCal": "04/08/2024", "due": "04/08/2026", "technician": "Andrea Alvarado"}, {"id": "5/16-24", "name": "Thread Plug Gage PD. GO/NOGO 5/16-24 UNF 2B", "department": "Quality", "lastCal": "04/08/2024", "due": "04/08/2026", "technician": "Andrea Alvarado"}, {"id": "8-32-UNC-2B", "name": "Thread Plug Gage Go/NOGO Nominal 8-32 UNC-2B", "department": "Quality", "lastCal": "04/08/2024", "due": "04/08/2026", "technician": "Andrea Alvarado"}, {"id": "1 1/4-12 UNF 2B", "name": "Thread Plug Gage GO/NOGO SIZE:1 1/4-12 UNF 2B", "department": "Quality", "lastCal": "05/01/2024", "due": "05/01/2026", "technician": "Andrea Alvarado"}, {"id": "1-1/2-11-1/2 NPT L-1.", "name": "Thread Plug Gage Size 1-1/2-11-1/2 NPT L-1.", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "M12X1.5-6H", "name": "PD GO/NOGO Thread Plug Gage Size M12x1.5-6H", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "7/16-14", "name": "Thread Plug Gage GO/NOGO 7/16-14 UNC-2B", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "M6X1.0", "name": "Metric Thread Plug Gage GO/NOGO M6X1.0-6H", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "10-24", "name": "Thread Gage item PD GP/NOGO Plug Gage 10-24", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "7/8-9", "name": "Thread Plug Gage GO/NOGO 7/8-9 UNC 2B", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "LA00110BG004", "name": "Thread Plug Gage PD, GO/NOGO 7/16-24 UNS-2B 9.14mm DEPTH", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "LA00125BG002", "name": "Thread Plug Gage GO/NOGO PD, M12X1.0-6H", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "J107697", "name": "Adjustable Thread Ring Gage GO PD. Nominal size,1 7/8-12 UN-2A", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "BG002", "name": "Metric GO/NOGO Thread Plug Gage M12.0X.1.75 LH-6H", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "BG006", "name": "GO/NOGO Thread Plug Gage M16.0X.1.00-6H.10.3mm DEPTH", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "94846", "name": "Metric GO, Thread Plug Gage M20X1.5", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "5889840", "name": "SPI. Plug Gage 1/8-27 NPT L1", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "LA26754", "name": "Thread Plug Gage GO/NOGO 1/2-14 NPSM 2B", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "789UNC2B", "name": "Thread Plug Gage GO/NOGO 7/8-9 UNC 2B", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "7/8-14", "name": "Thread Plug Gage GO/NOGO 7/8-14 UNF 2B", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "A05043", "name": "Metric PD GO/NOGO Thread Plug Gage Nominal M10x1.0-6H", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "629", "name": "Go/NOGO Thread Plug Gage M10.X.1.25-6H", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "A-02142", "name": "Thread Plug Gage GO/NOGO 9/16-18 UNF 2B", "department": "Quality", "lastCal": "05/10/2024", "due": "05/10/2026", "technician": "Andrea Alvarado"}, {"id": "1111D", "name": "12\" Dial Caliper", "department": "Management", "lastCal": "06/18/2025", "due": "06/18/2026", "technician": "Stephen Hein"}, {"id": "EC110856", "name": "Cas Scale", "department": "Machine Shop", "lastCal": "07/02/2025", "due": "07/02/2026", "technician": "Stephen Hein"}, {"id": "C23737", "name": "SCALE", "department": "Inventory Control", "lastCal": "07/02/2025", "due": "07/02/2026", "technician": "Stephen Hein"}, {"id": "C23815", "name": "SCALE", "department": "Assembly", "lastCal": "07/02/2025", "due": "07/02/2026", "technician": "Stephen Hein"}, {"id": "EC1168828", "name": "CAS SCALE", "department": "Deburr", "lastCal": "07/02/2025", "due": "07/02/2026", "technician": "Stephen Hein"}, {"id": "550001586", "name": "Penn Scale", "department": "Shipping", "lastCal": "07/02/2025", "due": "07/02/2026", "technician": "Stephen Hein"}, {"id": "AE621704", "name": "Adam Scale", "department": "Inventory Control", "lastCal": "07/02/2025", "due": "07/02/2026", "technician": "Stephen Hein"}, {"id": "AB29683", "name": "1-1.375\" ID MIC", "department": "Quality", "lastCal": "07/02/2025", "due": "07/02/2026", "technician": "Stephen Hein"}, {"id": "241225351", "name": "12\" Digital Caliper", "department": "Press Brake", "lastCal": "07/23/2025", "due": "07/23/2026", "technician": "Stephen Hein"}, {"id": "H-5821", "name": "55lb Counting Scale", "department": "Inventory Control", "lastCal": "07/29/2025", "due": "07/29/2026", "technician": "Stephen Hein"}, {"id": "170330459", "name": "12\" Digital Caliper", "department": "Press Brake", "lastCal": "08/04/2025", "due": "08/04/2026", "technician": "Stephen Hein"}, {"id": "160933352", "name": "12\" Digital Caliper", "department": "Laser", "lastCal": "08/07/2025", "due": "08/07/2026", "technician": "Stephen Hein"}, {"id": "QC3456", "name": "12\" Digital Caliper", "department": "Quality", "lastCal": "08/07/2025", "due": "08/07/2026", "technician": "Stephen Hein"}, {"id": "A20112628", "name": "6\" Digital Caliper", "department": "Material Handler", "lastCal": "08/12/2025", "due": "08/12/2026", "technician": "Stephen Hein"}, {"id": "500-196-30", "name": "6\" Digital Caliper", "department": "Quality", "lastCal": "08/12/2025", "due": "08/12/2026", "technician": "Stephen Hein"}, {"id": "ANSI/H28", "name": "2 1/4-12 UN-2A GO/NOGO SET", "department": "Quality", "lastCal": "08/12/2025", "due": "08/12/2026", "technician": "Stephen Hein"}, {"id": "190161347", "name": "6\" Dial Caliper", "department": "Machine Shop", "lastCal": "09/02/2025", "due": "09/02/2026", "technician": "Stephen Hein"}, {"id": "1604175", "name": "6\" Dial Caliper", "department": "Machine Shop", "lastCal": "09/02/2025", "due": "09/02/2026", "technician": "Stephen Hein"}, {"id": "MM1234", "name": "24\" Dial Height gage", "department": "Machine Shop", "lastCal": "09/02/2025", "due": "09/02/2026", "technician": "Stephen Hein"}, {"id": "MJ295069U", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "09/19/2026", "technician": "Stephen Hein"}, {"id": "200317295", "name": "6\" Digital Caliper", "department": "Inventory Control", "lastCal": "09/22/2025", "due": "09/22/2026", "technician": "Stephen Hein"}, {"id": "BC15829", "name": "12\" Digital Caliper", "department": "Weld TIG", "lastCal": "09/24/2025", "due": "09/24/2026", "technician": "Stephen Hein"}, {"id": "061823", "name": "12\" Digital Caliper", "department": "Weld TIG", "lastCal": "09/24/2025", "due": "09/24/2026", "technician": "Stephen Hein"}, {"id": "EC09885", "name": "12\" Digital Caliper", "department": "Weld TIG", "lastCal": "09/24/2025", "due": "09/24/2026", "technician": "Stephen Hein"}, {"id": "Tape Measure 1", "name": "3/4\"-16'", "department": "", "lastCal": "09/24/2025", "due": "09/24/2026", "technician": "Stephen Hein"}, {"id": "Tape Measure 2", "name": "35' Tape", "department": "", "lastCal": "09/24/2025", "due": "09/24/2026", "technician": "Stephen Hein"}, {"id": "EC05103", "name": "12\" Digital Caliper", "department": "SAW M/S", "lastCal": "10/07/2025", "due": "10/07/2026", "technician": "Stephen Hein"}, {"id": "NE070306N", "name": "Power Source/Feeder", "department": "Weld TIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NE251002U", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NE250779C", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NE290687C", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NE261112U", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "M3240109483", "name": "Power Source/Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NF283058N", "name": "Power Source/Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NF283060N", "name": "Power Source/Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NB490059U", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "J1997", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "P10355YDZ134841018", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NB474085U", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NB490054U", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NE321113U", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NE320767C", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "ME385067U", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NB444089U", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NB400067U", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NB444088U", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NB400070U", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "MJ380190L", "name": "Power Source", "department": "Weld TIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "LC452007", "name": "Power Source", "department": "Weld TIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "ME385065U", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "MH335059U", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "ME384032U", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "ME344237U", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "ME344239U", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "MH324095U", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "MH324102U", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "MJ204040U", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "LF339253", "name": "Power Source", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NB155017U", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "MD180851N", "name": "Power Source/Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NB293039N", "name": "Power Source/Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NB343014N", "name": "Power Source/Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "NB020935L", "name": "Power Source", "department": "Weld TIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "MH490634L", "name": "Power Source", "department": "Weld TIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "U30007YPZ165081014", "name": "Wire Feeder", "department": "Weld MIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "LH210244L", "name": "Power Source", "department": "Weld TIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "MA260406L", "name": "Power Source", "department": "Weld TIG", "lastCal": "11/03/2025", "due": "11/03/2026", "technician": "Stephen Hein"}, {"id": "PU-9-18", "name": "Surface Plate 96X48", "department": "Quality", "lastCal": "11/04/2025", "due": "11/04/2026", "technician": "Stephen Hein"}, {"id": "170160405", "name": "40\" Digital Caliper", "department": "Press Brake", "lastCal": "11/04/2025", "due": "11/04/2026", "technician": "Stephen Hein"}, {"id": "945253", "name": "Adjustable thread ring gage go pd m14x1.5 6g", "department": "Quality", "lastCal": "11/13/2024", "due": "11/13/2026", "technician": "Stephen Hein"}, {"id": "2806", "name": "Adjustable Thread Ring Gage NOT GO PD. 5/16-24 UNF-2A", "department": "Quality", "lastCal": "11/13/2024", "due": "11/13/2026", "technician": "Stephen Hein"}, {"id": "HK11186", "name": "12\" Digital Caliper", "department": "Machine Shop", "lastCal": "11/17/2025", "due": "11/17/2026", "technician": "Stephen Hein"}, {"id": "A20112624", "name": "6\" Digital Caliper", "department": "Machine Shop", "lastCal": "11/17/2025", "due": "11/17/2026", "technician": "Stephen Hein"}, {"id": "36884", "name": "Surface Plate 18X24\"", "department": "Machine Shop", "lastCal": "11/24/2025", "due": "11/24/2026", "technician": "Stephen Hein"}, {"id": "36883", "name": "Surface Plate 18x24\"", "department": "Receiving", "lastCal": "11/24/2025", "due": "11/24/2026", "technician": "Stephen Hein"}, {"id": "36882", "name": "Surface plate 36 x 60", "department": "Press Brake", "lastCal": "11/24/2025", "due": "11/24/2026", "technician": "Stephen Hein"}, {"id": "Tape Measure 4", "name": "3/4\" x 16\" Tape Measure", "department": "Quality", "lastCal": "12/01/2025", "due": "12/01/2026", "technician": "Stephen Hein"}, {"id": "Tape Measure 5", "name": "3/4\" X 16\" Tape Measure", "department": "Quality", "lastCal": "12/01/2025", "due": "12/01/2026", "technician": "Stephen Hein"}, {"id": "220422889", "name": "6\" Digital Caliper", "department": "Laser", "lastCal": "12/01/2025", "due": "12/01/2026", "technician": "Stephen Hein"}, {"id": "170209162", "name": "12\" Digital Caliper", "department": "Weld TIG", "lastCal": "12/01/2025", "due": "12/01/2026", "technician": "Stephen Hein"}, {"id": "HE21755", "name": "6\" Digital Caliper", "department": "Material Handler", "lastCal": "12/02/2025", "due": "12/02/2026", "technician": "Stephen Hein"}, {"id": "B17565108", "name": "6\" Digital Caliper", "department": "Machine Shop", "lastCal": "01/06/2026", "due": "01/06/2027", "technician": "Stephen Hein"}, {"id": "BG-109", "name": "1/4\"-3/4\" Bore Mic Pistol Grip", "department": "Quality", "lastCal": "01/26/2022", "due": "01/25/2027", "technician": "Andrea Alvarado"}, {"id": "DEOMC-043", "name": "1/4 - 5/16 Bore Gage", "department": "Quality", "lastCal": "01/26/2022", "due": "01/25/2027", "technician": "Andrea Alvarado"}, {"id": "DEOMC-039", "name": "5/16 - 3/8 Bore Gage", "department": "Quality", "lastCal": "01/26/2022", "due": "01/25/2027", "technician": "Andrea Alvarado"}, {"id": "DEOMC-070", "name": "3/8 - 1/2 Bore Gage", "department": "Quality", "lastCal": "01/26/2022", "due": "01/25/2027", "technician": "Andrea Alvarado"}, {"id": "DEOMC-046", "name": "1/2 - 5/8 Bore Gage", "department": "Quality", "lastCal": "01/26/2022", "due": "01/25/2027", "technician": "Andrea Alvarado"}, {"id": "DEOMC-049", "name": "5/8 -3/4 Bore Gage", "department": "Quality", "lastCal": "01/26/2022", "due": "01/25/2027", "technician": "Andrea Alvarado"}, {"id": "DEOMC-096", "name": "5/16 Bore Gage Master Ring", "department": "Quality", "lastCal": "01/26/2022", "due": "01/25/2027", "technician": "Andrea Alvarado"}, {"id": "DEOMC-095", "name": "1/2 Bore Gage Master Ring", "department": "Quality", "lastCal": "01/26/2022", "due": "01/25/2027", "technician": "Andrea Alvarado"}, {"id": "DEOMC-085", "name": "3/4 Bore Gage Master Ring", "department": "Quality", "lastCal": "01/26/2022", "due": "01/25/2027", "technician": "Andrea Alvarado"}, {"id": "EH00909", "name": "12\" Digital Caliper", "department": "SAW MIG", "lastCal": "01/28/2026", "due": "01/28/2027", "technician": "Stephen Hein"}, {"id": "867583", "name": "Adjustable Thread Ring Gage NOGO PD 8-32 UNC 2A", "department": "Quality", "lastCal": "02/04/2025", "due": "02/04/2027", "technician": "Andrea Alvarado"}, {"id": "1326420", "name": "Adjustable Thread Ring Gage NOGO PD 1/4-20 UNC-2A", "department": "Quality", "lastCal": "02/04/2025", "due": "02/04/2027", "technician": "Andrea Alvarado"}, {"id": "1259558", "name": "Adjustable Thread Ring Gage GO PD. 1/4-20 UNC-2A", "department": "Quality", "lastCal": "02/04/2025", "due": "02/04/2027", "technician": "Andrea Alvarado"}, {"id": "3327", "name": "Cal-Master 1.0-6.0\"", "department": "Quality", "lastCal": "02/04/2025", "due": "02/04/2027", "technician": "Andrea Alvarado"}, {"id": "1667675", "name": "Adjustable Thread Ring Gage Go PD. 1 1/4-12 UNF-2A", "department": "Quality", "lastCal": "02/04/2025", "due": "02/04/2027", "technician": "Andrea Alvarado"}, {"id": "1726844", "name": "Adjustable Thread Ring Gage NOGO PD. 1 1/4-12 UNF-2A", "department": "Quality", "lastCal": "02/04/2025", "due": "02/04/2027", "technician": "Andrea Alvarado"}, {"id": "AM457", "name": "SPI Thread Ring Gage 1/2-14 NPT L1", "department": "Quality", "lastCal": "02/04/2025", "due": "02/04/2027", "technician": "Andrea Alvarado"}, {"id": "0071038", "name": "12\" Digital Caliper", "department": "Machine Shop", "lastCal": "02/04/2026", "due": "02/04/2027", "technician": "Stephen Hein"}, {"id": "A16088601", "name": "6\" Digital Caliper", "department": "Machine Shop", "lastCal": "02/04/2026", "due": "02/04/2027", "technician": "Stephen Hein"}, {"id": "963250 GO", "name": "Adjustable Ring Gage GO PD. 1/2-20 UNF-2A", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "898994", "name": "Adjustable Ring Gage PD NOGO 1/2-20 UNF 2A", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "1169", "name": "Adjustable Thread Ring Gage GO PD.6-32 UNC-2A", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "909414", "name": "Adjustable Thread Ring Gage 6-32 UNC-2A NOGO PD.", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "364829", "name": "Adjustable Thread Ring Gage Go PD. 10-24 UNC-2A", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "356043", "name": "Adjustable Thread Ring Gage NOGO PD. 10-24 UNC-2A", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "814526", "name": "Adjustable Thread Ring Gage GO PD M16X2-6g", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "14503", "name": "Adjustable Thread Ring Gage NOT GO PD M16x2-6g", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "8994", "name": "Adjustable Thread Ring Gage, Metric GO PD M10X1.5-6g", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "8862", "name": "Adjustable Thread Ring Gage, Metric NOGO PD M10X1.5-6g", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "10829 GO", "name": "Adjustable Thread Ring Gage, Metric GO PD M12x1.75G-6g", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "822916 NOGO", "name": "Thread Ring Gage Metric NOGO PD M12x1.75-6g", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "1890310", "name": "Adjustable Thread Ring Gage PD GO 1/2-13 UNC 2A", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "1890308", "name": "Adjustable Thread Ring Gage PD NOGO 1/2-13 UNC 2A", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "1428", "name": "Adjustable Thread Ring Gage GO PD. 8-32 UNC 2A", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "J693784", "name": "2 1/2-8 NPT", "department": "Quality", "lastCal": "02/05/2026", "due": "02/05/2027", "technician": "Stephen Hein"}, {"id": "822916 GO", "name": "Thread Ring Gage M12X1.75-6G GO", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "10829 NOGO", "name": "Thread Ring Gage M12X1.75-6G NOGO", "department": "Quality", "lastCal": "02/05/2025", "due": "02/05/2027", "technician": "Andrea Alvarado"}, {"id": "170209153", "name": "12\" Digital Caliper", "department": "SAW MIG", "lastCal": "02/09/2026", "due": "02/09/2027", "technician": "Stephen Hein"}, {"id": "150740745", "name": "12\" Digital Caliper", "department": "Assembly", "lastCal": "02/09/2026", "due": "02/09/2027", "technician": "Stephen Hein"}, {"id": "361541051 NOGO", "name": "Adjustable Ring Gage PD NOGO 1/2-20 UNF 2A LH", "department": "Quality", "lastCal": "02/18/2025", "due": "02/18/2027", "technician": "Andrea Alvarado"}, {"id": "361541051 GO", "name": "Adjustable Ring Gage PD GO 1/2-20 UNF 2A LH", "department": "Quality", "lastCal": "02/18/2025", "due": "02/18/2027", "technician": "Andrea Alvarado"}, {"id": "4475", "name": "Adjustable Thread Ring Gage GO PD.15/32-32 UNS-2A", "department": "Quality", "lastCal": "02/18/2025", "due": "02/18/2027", "technician": "Andrea Alvarado"}, {"id": "206383", "name": "Adjustable Thread Ring Gage NOGO 3/4-20 UNEF 2A", "department": "Quality", "lastCal": "02/18/2025", "due": "02/18/2027", "technician": "Andrea Alvarado"}, {"id": "199766", "name": "Adjustable Thread Ring Gage GO 3/4-20 UNEF-2A", "department": "Quality", "lastCal": "02/18/2025", "due": "02/18/2027", "technician": "Andrea Alvarado"}, {"id": "1024UNC2B", "name": "Go/No-Go plug gage size 10-24 UNC 2B", "department": "Quality", "lastCal": "03/05/2026", "due": "02/28/2027", "technician": "Stephen Hein"}, {"id": "72360579", "name": "OD Micrometer", "department": "Quality", "lastCal": "03/02/2026", "due": "03/02/2027", "technician": "Stephen Hein"}, {"id": "170348473", "name": "12\" Digital Caliper", "department": "Engineering", "lastCal": "03/02/2026", "due": "03/02/2027", "technician": "Stephen Hein"}, {"id": "B18090852", "name": "6\" Digital Caliper", "department": "Engineering", "lastCal": "03/02/2026", "due": "03/02/2027", "technician": "Stephen Hein"}, {"id": "200409304", "name": "24\" Digital Caliper", "department": "Quality", "lastCal": "03/02/2026", "due": "03/02/2027", "technician": "Stephen Hein"}, {"id": "10306027", "name": "8\" Digital Caliper", "department": "Machine Shop", "lastCal": "03/02/2026", "due": "03/02/2027", "technician": "Stephen Hein"}, {"id": "A20152104", "name": "6\" Digital Caliper", "department": "Assembly", "lastCal": "03/02/2026", "due": "03/02/2027", "technician": "Stephen Hein"}, {"id": "WM-3000", "name": "Keyence", "department": "Quality", "lastCal": "03/02/2026", "due": "03/02/2027", "technician": "Stephen Hein"}, {"id": "15-374-2", "name": "24\" Height Gage", "department": "Press Brake", "lastCal": "03/03/2026", "due": "03/03/2027", "technician": "Stephen Hein"}, {"id": "160933380", "name": "12\" Digital Caliper", "department": "Quality", "lastCal": "03/03/2026", "due": "03/03/2027", "technician": "Stephen Hein"}, {"id": "160714213", "name": "12\" Digital Caliper", "department": "Quality", "lastCal": "03/03/2026", "due": "03/03/2027", "technician": "Stephen Hein"}, {"id": ".874 - pin gage", "name": ".874- pin gage", "department": "Quality", "lastCal": "03/03/2026", "due": "03/03/2027", "technician": "Stephen Hein"}, {"id": ".875- pin gage", "name": ".875- pin gage", "department": "Quality", "lastCal": "03/03/2026", "due": "03/03/2027", "technician": "Stephen Hein"}, {"id": ".627 Minus", "name": ".627 PIN GAGE", "department": "Quality", "lastCal": "03/05/2026", "due": "03/05/2027", "technician": "Stephen Hein"}, {"id": ".627 PLUS", "name": ".627+ PIN GAGE", "department": "Quality", "lastCal": "03/05/2026", "due": "03/05/2027", "technician": "Stephen Hein"}, {"id": "170330508", "name": "12\" Digital Caliper", "department": "Press Brake", "lastCal": "03/09/2026", "due": "03/09/2027", "technician": "Stephen Hein"}, {"id": "HE21662", "name": "6\" Digital Caliper", "department": "Laser", "lastCal": "03/09/2026", "due": "03/09/2027", "technician": "Stephen Hein"}, {"id": "180702694", "name": "12\" Digital Caliper", "department": "Press Brake", "lastCal": "03/10/2026", "due": "03/10/2027", "technician": "Stephen Hein"}, {"id": "220425372", "name": "12\" Digital Caliper", "department": "Press Brake", "lastCal": "03/10/2026", "due": "03/10/2027", "technician": "Stephen Hein"}, {"id": "A18295933", "name": "8\" Digital Caliper", "department": "Weld TIG", "lastCal": "03/10/2026", "due": "03/10/2027", "technician": "Stephen Hein"}, {"id": "160933346", "name": "12\" Digital Caliper", "department": "Management", "lastCal": "03/11/2026", "due": "03/11/2027", "technician": "Stephen Hein"}, {"id": "160936834", "name": "12\" Digital Caliper", "department": "Weld TIG", "lastCal": "03/11/2026", "due": "03/11/2027", "technician": "Stephen Hein"}, {"id": "18963", "name": "Phase2 Hardness tester", "department": "Quality", "lastCal": "03/16/2026", "due": "03/16/2027", "technician": "Stephen Hein"}, {"id": "HFDA027580828", "name": "6\" Digital Caliper", "department": "Machine Shop", "lastCal": "04/15/2026", "due": "04/15/2027", "technician": "Stephen Hein"}, {"id": "M16X2.0-6H", "name": "Thread Plug Gage GO/NOGO M16x2.0-6H", "department": "Quality", "lastCal": "04/16/2026", "due": "04/16/2027", "technician": "Stephen Hein"}, {"id": "250101228", "name": "12\" Digital Caliper", "department": "Machine Shop", "lastCal": "04/21/2026", "due": "04/21/2027", "technician": "Stephen Hein"}, {"id": "26012479115", "name": "6\" Digital Caliper", "department": "Machine Shop", "lastCal": "04/27/2026", "due": "04/27/2027", "technician": "Stephen Hein"}, {"id": "KTL02126", "name": "25MM Digital Micrometer", "department": "Machine Shop", "lastCal": "04/27/2026", "due": "04/27/2027", "technician": "Stephen Hein"}, {"id": "EH00695", "name": "12\" Digital Caliper", "department": "Press Brake", "lastCal": "05/20/2026", "due": "05/20/2027", "technician": "Stephen Hein"}, {"id": "Tape Measure 3", "name": "33' tape measure", "department": "Quality", "lastCal": "05/20/2026", "due": "05/20/2027", "technician": "Stephen Hein"}, {"id": "G1 001715", "name": "24\" Digital Height Gage", "department": "Quality", "lastCal": "05/20/2026", "due": "05/20/2027", "technician": "Stephen Hein"}, {"id": "05.0830", "name": "12\" Dial Calipers", "department": "Machine Shop", "lastCal": "05/26/2026", "due": "05/26/2027", "technician": "Stephen Hein"}, {"id": "EC13772", "name": "12\" Digital Caliper", "department": "Machine Shop", "lastCal": "05/27/2026", "due": "05/27/2027", "technician": "Stephen Hein"}, {"id": "HK11184", "name": "12\" Digital Caliper", "department": "Press Brake", "lastCal": "05/27/2026", "due": "05/27/2027", "technician": "Stephen Hein"}, {"id": "HK00212", "name": "12\" Digital Caliper", "department": "Machine Shop", "lastCal": "05/27/2026", "due": "05/27/2027", "technician": "Stephen Hein"}, {"id": "160933311", "name": "12\" Digital Caliper", "department": "Press Brake", "lastCal": "06/15/2026", "due": "06/15/2027", "technician": "Stephen Hein"}, {"id": "160936732", "name": "12\" Digital Caliper", "department": "Press Brake", "lastCal": "06/15/2026", "due": "06/15/2027", "technician": "Stephen Hein"}, {"id": "SH7H31374", "name": "12\" Digital Caliper", "department": "Plate Roll", "lastCal": "06/15/2026", "due": "06/15/2027", "technician": "Stephen Hein"}, {"id": "250101241", "name": "12\" Digital Caliper", "department": "Punch", "lastCal": "06/15/2026", "due": "06/15/2027", "technician": "Stephen Hein"}, {"id": "220425295", "name": "12\" Digital Caliper", "department": "Deburr", "lastCal": "06/15/2026", "due": "06/15/2027", "technician": "Stephen Hein"}, {"id": "250101260", "name": "12\" Digital Caliper", "department": "Weld MIG", "lastCal": "06/22/2026", "due": "06/22/2027", "technician": "Stephen Hein"}, {"id": "EC05395", "name": "12\" Digital Caliper", "department": "Weld TIG", "lastCal": "06/22/2026", "due": "06/22/2027", "technician": "Stephen Hein"}, {"id": "06381507", "name": "6\" Digital Caliper", "department": "Engineering", "lastCal": "06/22/2026", "due": "06/22/2027", "technician": "Stephen Hein"}, {"id": "1062250", "name": "12\" Dial Caliper", "department": "Engineering", "lastCal": "06/22/2026", "due": "06/22/2027", "technician": "Stephen Hein"}, {"id": "HD00712", "name": "12\" Digital Caliper", "department": "Weld MIG", "lastCal": "06/22/2026", "due": "06/22/2027", "technician": "Stephen Hein"}, {"id": "160936729", "name": "12\" Digital Caliper", "department": "Laser", "lastCal": "06/23/2026", "due": "06/23/2027", "technician": "Stephen Hein"}, {"id": "170209095", "name": "12\" Digital Caliper", "department": "Laser", "lastCal": "06/23/2026", "due": "06/23/2027", "technician": "Stephen Hein"}, {"id": "210-1-025", "name": "18\" Height Gage", "department": "Machine Shop", "lastCal": "06/30/2026", "due": "06/30/2027", "technician": "Stephen Hein"}, {"id": "HD00768", "name": "12\" Digital Caliper", "department": "Machine Shop", "lastCal": "06/30/2026", "due": "06/30/2027", "technician": "Stephen Hein"}, {"id": "3/4-10 UNC-2A", "name": "Thread Ring Gage GO 3/4-10 UNC 2A", "department": "Quality", "lastCal": "07/09/2025", "due": "07/09/2027", "technician": "Stephen Hein"}, {"id": "M8X1.25-6 2580690/2569156", "name": "Thread Ring Gage PD GO/NOGO M8X1.25-6G", "department": "Quality", "lastCal": "07/09/2025", "due": "07/09/2027", "technician": "Stephen Hein"}, {"id": "7/8-14 UNF-2A", "name": "Adjustable Thread Ring Gage GO/NOGO, 7/8-14-UNF-2A #1,2", "department": "Quality", "lastCal": "07/09/2025", "due": "07/09/2027", "technician": "Stephen Hein"}, {"id": "M4X.7-6H", "name": "Thread Plug Gage GO/NOGO Metric M4X.7-6H", "department": "Quality", "lastCal": "07/15/2025", "due": "07/15/2027", "technician": "Stephen Hein"}, {"id": "M10X1.5-6H", "name": "Thread Plug Gage Set GO/NOGO Metric M10X.1.5-6H", "department": "Quality", "lastCal": "07/15/2025", "due": "07/15/2027", "technician": "Stephen Hein"}, {"id": "7/16-14 UNC-2B", "name": "Thread Plug Gage Set GO/NOGO 7/16-14 UNC-2B", "department": "Quality", "lastCal": "07/15/2025", "due": "07/15/2027", "technician": "Stephen Hein"}, {"id": "M16X1.0-6H", "name": "Thread Plug Gage Set GO/NOGO Metric M16X1.0-6H", "department": "Quality", "lastCal": "07/15/2025", "due": "07/15/2027", "technician": "Stephen Hein"}, {"id": "M12X1.0-6H", "name": "Thread Plug Gage Set GO/NOGO Metric. M12X1.0-6H", "department": "Quality", "lastCal": "07/15/2025", "due": "07/15/2027", "technician": "Stephen Hein"}, {"id": "M10X1.0-6H TG 2", "name": "Metric PD GO/NOGO Thread Plug Gage. M10X1.0-6H TG#2", "department": "Quality", "lastCal": "07/15/2025", "due": "07/15/2027", "technician": "Stephen Hein"}, {"id": "1/2-20 UNF-2B", "name": "Thread Plug Gage Set GO/NOGO Metric 1/2-20 UNF-2B", "department": "Quality", "lastCal": "07/15/2025", "due": "07/15/2027", "technician": "Stephen Hein"}, {"id": "3/4-14 NPSM 2B", "name": "3/4-14 NPSM 2B GO/NOGO Assy", "department": "Quality", "lastCal": "07/15/2025", "due": "07/15/2027", "technician": "Stephen Hein"}, {"id": "QN211014608B", "name": "12 Dial Caliper", "department": "Structural Laser", "lastCal": "07/15/2026", "due": "07/15/2027", "technician": "Stephen Hein"}, {"id": "1/2-13 UNC 2B G/NG", "name": "1/2-13 GO/NOGO Thread Gage", "department": "Quality", "lastCal": "07/30/2025", "due": "07/30/2027", "technician": "Stephen Hein"}, {"id": "10-32 UNF 2B G/NG", "name": "10-32 GO?NOGO Thread Gage", "department": "Quality", "lastCal": "07/30/2025", "due": "07/30/2027", "technician": "Stephen Hein"}, {"id": "150727497", "name": "1\" micrometer", "department": "Machine Shop", "lastCal": "08/17/2026", "due": "08/08/2027", "technician": "Stephen Hein"}, {"id": "J341109", "name": "Thread Ring Gage 5/8-18 UNF-2A LH GO/NOGO SET", "department": "Quality", "lastCal": "08/12/2025", "due": "08/12/2027", "technician": "Stephen Hein"}, {"id": "180701533", "name": "12\" Digital Caliper", "department": "Machine Shop", "lastCal": "08/17/2026", "due": "08/17/2027", "technician": "Stephen Hein"}, {"id": "21077494", "name": "6\" Digital Caliper", "department": "Machine Shop", "lastCal": "08/17/2026", "due": "08/17/2027", "technician": "Stephen Hein"}, {"id": "220514928", "name": "6\" Digital Caliper", "department": "Machine Shop", "lastCal": "08/17/2026", "due": "08/17/2027", "technician": "Stephen Hein"}, {"id": "632UNC2B", "name": "Thread Plug Gage Set GO/NOGO 6-32 UNC-2B", "department": "Quality", "lastCal": "09/11/2025", "due": "09/11/2027", "technician": "Stephen Hein"}, {"id": "M5X.8-6H", "name": "Thread Plug Gage Set GO/NOGO M5X.8-6H", "department": "Quality", "lastCal": "09/11/2025", "due": "09/11/2027", "technician": "Stephen Hein"}, {"id": "M8X1.25", "name": "Threaded Plug Gage set GO/NOGO M8X1.25-6H", "department": "Quality", "lastCal": "09/11/2025", "due": "09/11/2027", "technician": "Stephen Hein"}, {"id": "7/8-14 UNF-2B", "name": "Thread Plug Gage GO/NOGO PD, Nominal 7/8-14 UNF 2B", "department": "Quality", "lastCal": "09/11/2025", "due": "09/11/2027", "technician": "Stephen Hein"}, {"id": "M10X1.0-6H TG 1", "name": "Metric PD GO/NOGO Thread Plug Gage. M10X1.0-6H TG#1", "department": "Quality", "lastCal": "09/11/2025", "due": "09/11/2027", "technician": "Stephen Hein"}, {"id": "128313448", "name": "Thread Plug Gage PD. GO/NOGO M4X7-6H", "department": "Quality", "lastCal": "09/11/2025", "due": "09/11/2027", "technician": "Stephen Hein"}, {"id": "302125530", "name": "Metric GO/NOGO Thread Plug Gage M10.X.1.50-6H", "department": "Quality", "lastCal": "09/11/2025", "due": "09/11/2027", "technician": "Stephen Hein"}, {"id": "13-184-7", "name": "2pc angle block set", "department": "Quality", "lastCal": "09/17/2025", "due": "09/17/2027", "technician": "Stephen Hein"}, {"id": "3/4-10 UNC 2A STL GO RING GAGE", "name": "3/4-10 UNC 2A STL GO RING GAGE", "department": "Quality", "lastCal": "09/17/2025", "due": "09/17/2027", "technician": "Stephen Hein"}, {"id": "3/4-14 NPT BASIC L1 RING", "name": "3/4-14 NPT BASIC L1 RING", "department": "Quality", "lastCal": "09/17/2025", "due": "09/17/2027", "technician": "Stephen Hein"}, {"id": "08091", "name": "Rectangular Gage Block 8\"", "department": "Quality", "lastCal": "09/19/2025", "due": "09/19/2027", "technician": "Stephen Hein"}, {"id": "M9947", "name": "Master Ring Gages 2\"", "department": "Quality", "lastCal": "09/19/2025", "due": "09/19/2027", "technician": "Stephen Hein"}, {"id": "11542-003", "name": "2-4-6 Block set", "department": "Quality", "lastCal": "09/22/2025", "due": "09/22/2027", "technician": "Stephen Hein"}, {"id": "11542-002", "name": "1-2-3 Blocks set", "department": "Quality", "lastCal": "09/22/2025", "due": "09/22/2027", "technician": "Stephen Hein"}, {"id": "M1M", "name": "PIN GAGE SET 0.61-.250", "department": "Quality", "lastCal": "09/24/2025", "due": "09/24/2027", "technician": "Stephen Hein"}, {"id": "M2M", "name": "PIN GAGE SET .251-.500", "department": "Quality", "lastCal": "09/24/2025", "due": "09/24/2027", "technician": "Stephen Hein"}, {"id": "M3M", "name": "PIN GAGE SET .501-.625", "department": "Quality", "lastCal": "09/24/2025", "due": "09/24/2027", "technician": "Stephen Hein"}, {"id": "1/4-20 UNC-2B", "name": "Thread Plug Gage Set GO/NOGO 1/4-20 UNC-2B", "department": "Quality", "lastCal": "10/09/2025", "due": "10/09/2027", "technician": "Stephen Hein"}, {"id": "1-14 UNS -2B", "name": "Thread PLUG GAGE NO GO PD 1-14-UNS-2B", "department": "Quality", "lastCal": "10/09/2025", "due": "10/09/2027", "technician": "Stephen Hein"}, {"id": "M3X.5-6H", "name": "GO/NOGO PD. Thread Plug Gage M3X.5-6H", "department": "Quality", "lastCal": "10/09/2025", "due": "10/09/2027", "technician": "Stephen Hein"}, {"id": "12-28", "name": "Thread Plug Gage PD GO/NOGO PD. 12-28 UNF 2B", "department": "Quality", "lastCal": "10/09/2025", "due": "10/09/2027", "technician": "Stephen Hein"}, {"id": "3-56", "name": "Thread Plug Gage PD, GO/NOGO PD 3-56 UNF 2B", "department": "Quality", "lastCal": "10/09/2025", "due": "10/09/2027", "technician": "Stephen Hein"}, {"id": "1962692", "name": "Adjustable Thread Ring Gage NOGO 3/8-24 UNF-2A", "department": "Quality", "lastCal": "10/09/2025", "due": "10/09/2027", "technician": "Stephen Hein"}, {"id": "2080414", "name": "Adjustable Thread Ring Gage GO PD. 3/8-24 UNF-2A", "department": "Quality", "lastCal": "10/09/2025", "due": "10/09/2027", "technician": "Stephen Hein"}, {"id": "1-14-GO", "name": "1\"-14 UNS-2A GO ring", "department": "Quality", "lastCal": "11/17/2025", "due": "11/17/2027", "technician": "Stephen Hein"}, {"id": "1 7/8-12 UN-2A", "name": "Thread Ring Gage NOGO. 1 7/8-12 UN-2A", "department": "Quality", "lastCal": "11/17/2025", "due": "11/17/2027", "technician": "Stephen Hein"}, {"id": "09154", "name": "Rectangular Gage Block 12\"", "department": "Quality", "lastCal": "11/17/2025", "due": "11/17/2027", "technician": "Stephen Hein"}, {"id": "K-50432", "name": "NPT Thread Ring Gage 1-1/4-11 1/2 NPT", "department": "Quality", "lastCal": "11/17/2025", "due": "11/17/2027", "technician": "Stephen Hein"}, {"id": "1-14-NOGO", "name": "1\"-14 UNS-2A NOGO ring", "department": "Quality", "lastCal": "11/17/2025", "due": "11/17/2027", "technician": "Stephen Hein"}, {"id": "1/4-18 NPT", "name": "1/4-18 NPT", "department": "Quality", "lastCal": "11/17/2025", "due": "11/17/2027", "technician": "Stephen Hein"}, {"id": "M10X1.0-6g GO/NOGO", "name": "Adjustable Thread Ring Gage pd GO/NOGO M10X1.0-6g", "department": "Quality", "lastCal": "01/06/2026", "due": "01/06/2028", "technician": "Stephen Hein"}, {"id": ".788 minus pin gage", "name": ".788 Pin gage", "department": "Quality", "lastCal": "02/05/2026", "due": "02/05/2028", "technician": "Stephen Hein"}, {"id": ".787 minus pin gage", "name": ".787 minus pin gage", "department": "Quality", "lastCal": "02/05/2026", "due": "02/05/2028", "technician": "Stephen Hein"}, {"id": "4510800", "name": "Micrometer 7.0 - 8.0", "department": "Quality", "lastCal": "03/03/2026", "due": "03/02/2028", "technician": "Stephen Hein"}, {"id": "4510900", "name": "Micrometer 8.0 - 9.0", "department": "Quality", "lastCal": "03/04/2026", "due": "03/03/2028", "technician": "Stephen Hein"}, {"id": "4511000", "name": "Micrometer 9.0 -10.0", "department": "Quality", "lastCal": "03/04/2026", "due": "03/03/2028", "technician": "Stephen Hein"}, {"id": "4511100", "name": "Micrometer 10.0 -11.0", "department": "Quality", "lastCal": "03/04/2026", "due": "03/03/2028", "technician": "Stephen Hein"}, {"id": "4511200", "name": "Micrometer 11.0 -12.0", "department": "Quality", "lastCal": "03/04/2026", "due": "03/03/2028", "technician": "Stephen Hein"}, {"id": "M18x1.5 NO GO", "name": "Not go thread ring gage M18x1.5 NOGO", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "M18X1.5 GO", "name": "Metric thread ring gage size m18x1.5 6g GO", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "1.000-6 ACME-2G", "name": "Thread Plug Gage PD, GO/NOGO Nominal 1.000-6 STUD ACME 2G", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "B-21023", "name": "Thread Plug Gage PD,GO/NOGO 3/8-24 UNF-2B (LH)", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "1/2-20", "name": "Thread Plug Gage PD, GO/NOGO Nominal 1/2-20 UNF-2B", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "M6X1.0-6H", "name": "Metric GO/NOGO Thread Plug Gage M6X1.0-6H", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "81557480", "name": "Thread Plug Gage GO/NOGO PD, Nominal M20X2.5-6H", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "K-59496", "name": "Thread Ring Gage 2.0-11 1/2 NPT L1", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "M16X1.5-6H", "name": "Thread Plug Gage Set GO/NOGO M16X1.5-6H", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "2609412", "name": "PD GO Adjustable Thread Ring Gage 1/4-28 UNF3A", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "Q1-2-D", "name": "Pin Set .626 - .750", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "1 7/8-12 UN-2B", "name": "Thread Plug Gage PD, GO/NOGO PD, Nominal 1 7/8-12 UN-2B", "department": "Quality", "lastCal": "03/05/2026", "due": "03/04/2028", "technician": "Stephen Hein"}, {"id": "961587", "name": "Bore Gage", "department": "Quality", "lastCal": "03/10/2026", "due": "03/09/2028", "technician": "Stephen Hein"}, {"id": "RM924", "name": "Thread ring gage size M24x3-6-6g GO", "department": "Quality", "lastCal": "03/23/2026", "due": "03/22/2028", "technician": "Stephen Hein"}, {"id": "MN475", "name": "Thread ring gage size M24x3-6-6g NOGO", "department": "Quality", "lastCal": "03/23/2026", "due": "03/22/2028", "technician": "Stephen Hein"}, {"id": "CM8", "name": "Thread ring size M30x3.5-6g GO", "department": "Quality", "lastCal": "03/23/2026", "due": "03/22/2028", "technician": "Stephen Hein"}, {"id": "CM9", "name": "Thread ring gage size M30x3.5-6g NOGO", "department": "Quality", "lastCal": "03/23/2026", "due": "03/22/2028", "technician": "Stephen Hein"}, {"id": "2013", "name": "Micrometer Std Set 6.0/7.0/8.0/9.0/10.0/11.0", "department": "Quality", "lastCal": "04/09/2026", "due": "04/08/2028", "technician": "Stephen Hein"}, {"id": "M01264 mic", "name": "ID Micrometer 1.37500/1.75000/2.00000", "department": "Quality", "lastCal": "04/14/2026", "due": "04/13/2028", "technician": "Stephen Hein"}, {"id": "1873118", "name": "PD, GO/NOGO Thread Plug Gage 1/4-28-UNF-2B", "department": "Quality", "lastCal": "04/16/2026", "due": "04/15/2028", "technician": "Andrea Alvarado"}, {"id": "5/8-18", "name": "Thread Plug Gage GO/NOGO. 5/8-18-UNC 2B", "department": "Quality", "lastCal": "04/16/2026", "due": "04/15/2028", "technician": "Andrea Alvarado"}, {"id": "1873125", "name": "Thread Plug Gauge GO/NOGO. 3/8-16 UNC-2B", "department": "Quality", "lastCal": "04/16/2026", "due": "04/15/2028", "technician": "Andrea Alvarado"}, {"id": "51618UNC2B", "name": "Thread Plug Gage PD GO/NOGO 5/16-18-UNC-2B", "department": "Quality", "lastCal": "04/16/2026", "due": "04/15/2028", "technician": "Andrea Alvarado"}, {"id": "1/2-20 UNF-2B L.H", "name": "Thread Plug Gage GO/NOGO 1/2-20 UNF-2B L.H", "department": "Quality", "lastCal": "04/16/2026", "due": "04/15/2028", "technician": "Andrea Alvarado"}, {"id": "3/8-24", "name": "Thread Plug Gage GO/NOGO 3/8-24 UNF-2B", "department": "Quality", "lastCal": "04/22/2026", "due": "04/21/2028", "technician": "Andrea Alvarado"}, {"id": "1/4-28", "name": "Thread Plug Gage GO/NOGO 1/4-28 UNF 2B", "department": "Quality", "lastCal": "04/22/2026", "due": "04/21/2028", "technician": "Andrea Alvarado"}, {"id": "LA00122BG003", "name": "Thread Plug Gage PD, GO/NOGO 3/8-24 UNF-2B", "department": "Quality", "lastCal": "04/22/2026", "due": "04/21/2028", "technician": "Andrea Alvarado"}, {"id": "4-40", "name": "Thread Plug Gage PD, GO/NOGO Nominal 4-40-UNC-2B", "department": "Quality", "lastCal": "04/22/2026", "due": "04/21/2028", "technician": "Andrea Alvarado"}, {"id": "4-48", "name": "Thread Plug Gage PD GO/NOGO. 4-48-UNF-2B", "department": "Quality", "lastCal": "04/23/2026", "due": "04/22/2028", "technician": "Stephen Hein"}, {"id": "5-40", "name": "Plug Gage GO/NOGO 5-40-UNC-2B", "department": "Quality", "lastCal": "04/23/2026", "due": "04/22/2028", "technician": "Stephen Hein"}, {"id": "5-44", "name": "Thread Plug Gage PD, GO/NOGO Nominal 5-44-UNF-2B", "department": "Quality", "lastCal": "04/23/2026", "due": "04/22/2028", "technician": "Stephen Hein"}, {"id": "6-40", "name": "Thread Plug Gage PD, GO/NOGO 6-40-UNF-2B", "department": "Quality", "lastCal": "04/23/2026", "due": "04/22/2028", "technician": "Stephen Hein"}, {"id": "8-36", "name": "Thread Plug Gage PD, GO/NOGO 8-36-UNF-2B", "department": "Quality", "lastCal": "04/23/2026", "due": "04/22/2028", "technician": "Stephen Hein"}, {"id": "12-24", "name": "Thread Plug Gage PD GO/NOGO 12/24-UNC-2B", "department": "Quality", "lastCal": "04/23/2026", "due": "04/22/2028", "technician": "Stephen Hein"}, {"id": "12-32", "name": "Thread Plug Gage PD GO/NOGO. 12-32-UNEF-2B", "department": "Quality", "lastCal": "04/23/2026", "due": "04/22/2028", "technician": "Stephen Hein"}, {"id": "LT1-001", "name": "Import Gage Block Set Inch", "department": "Quality", "lastCal": "04/29/2026", "due": "04/28/2028", "technician": "Stephen Hein"}, {"id": "2-56", "name": "Thread Plug Gage PD GO/NOGO. 2-56-UNC-2B", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "2-64", "name": "Thread Plug Gage PD GO/NOGO. 2-64-UNF-2B", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "3-48", "name": "Thread Plug Gage PD GO/NOGO. 3-48-UNC-2B", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "LA19724", "name": "Thread Plug Gage PD GO NOT GO 9/16-18 UNF-2B", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "LA00135BG002", "name": "Thread Plug Gage PD, GO M10X1-6G to 3.3-0.4 True Position 0.25M", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "M10x1.25", "name": "Metric GO/NOGO Thread Plug Gage M10.X.1.25-6H", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "LA00117BG002", "name": "Thread Plug Gage PD GO/NOGO. M16X1-6G", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "1988935", "name": "Gage PD GO/NOGO 3/8-16-UNC-2B", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "1988932", "name": "Thread Plug Gage PD.GO/NOGO 1/2-13-UNC-2B", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "302130530", "name": "Thread Plug Gage GO/NOGO size M12x1.75-6H", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "LA00133BG004", "name": "Metric GO Thread Plug Gage M14.X.1.50-6G TO 4.6+0 -0.4 True Position 0.25MMC.", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "301110040", "name": "Item PD GO/NOGO Plug Gage size: 4-40 UNC", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "1988943-1", "name": "Thread Plug Gage PD GO/NOGO 6/32 UNC-2B", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "3/4-14 NPT", "name": "Thread Plug Gage Nominal 3/4-14 NPT", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "1-11.5 NPSC-2", "name": "Straight Pipe Thread Plug Gage GO/NOGO Nominal 1-11.5 NPSC", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "3/8-18 NPT L1", "name": "Thread Plug Gage Nominal 3/8-18 NPT L1", "department": "Quality", "lastCal": "05/26/2026", "due": "05/25/2028", "technician": "Stephen Hein"}, {"id": "1 3/8-12 UNF 2B", "name": "Thread Plug Gage PD, GO/NOGO PD, Nominal 1-3/8-12 UNF 2B", "department": "Quality", "lastCal": "06/01/2026", "due": "05/31/2028", "technician": "Andrea Alvarado"}, {"id": "2-3/4-16 UN RING GAGE", "name": "2-3/4-16 un ring gage", "department": "Quality", "lastCal": "06/01/2026", "due": "05/31/2028", "technician": "Stephen Hein"}, {"id": "2 3/4-16 UN Thread Gage", "name": "2 3/4-16 UN Thread Gage", "department": "Quality", "lastCal": "06/01/2026", "due": "05/31/2028", "technician": "Stephen Hein"}, {"id": "080554189", "name": "I.D Micrometer 0.2-2.2\"", "department": "Quality", "lastCal": "06/24/2026", "due": "06/23/2028", "technician": "Stephen Hein"}, {"id": "10110999", "name": "Dial Pro.", "department": "Quality", "lastCal": "06/26/2026", "due": "06/25/2028", "technician": "Stephen Hein"}, {"id": "10111080", "name": "Dial Pro.", "department": "Quality", "lastCal": "06/26/2026", "due": "06/25/2028", "technician": "Stephen Hein"}, {"id": "51624UNF2B", "name": "Thread Plug Gage PD. GO/NOGO. 5/16-24 UNF-2B", "department": "Quality", "lastCal": "07/30/2026", "due": "07/29/2028", "technician": "Stephen Hein"}, {"id": "5/16-18", "name": "Thread Plug Gage PD, GO/NOGO 5/16-18 UNC-2B", "department": "Quality", "lastCal": "08/03/2026", "due": "08/02/2028", "technician": "Stephen Hein"}, {"id": "3/4-10", "name": "Thread Plug Gage GO/NOGO Nominal 3/4-10 UNC 2B", "department": "Quality", "lastCal": "08/03/2026", "due": "08/02/2028", "technician": "Stephen Hein"}, {"id": "9/16-12", "name": "Thread Plug Gage GO/NOGO 9/16-12-UNC 2B", "department": "Quality", "lastCal": "08/03/2026", "due": "08/02/2028", "technician": "Stephen Hein"}, {"id": "3/4-16", "name": "Thread Plug Gage GO/NOGO Nominal 3/4-16 UNF 2B", "department": "Quality", "lastCal": "08/04/2026", "due": "08/03/2028", "technician": "Stephen Hein"}, {"id": "1-8", "name": "Thread Plug Gage GO/NOGO Nominal 1-8 UNC-2B", "department": "Quality", "lastCal": "08/04/2026", "due": "08/03/2028", "technician": "Stephen Hein"}, {"id": "112UNF2B", "name": "Thread Plug Gage GO/NOGO Nominal 1-2-UNF 2B", "department": "Quality", "lastCal": "08/04/2026", "due": "08/03/2028", "technician": "Stephen Hein"}, {"id": "1386UNC2B", "name": "Thread Plug Gage GO/NOGO Nominal 1-3/8-6 UNC 2B", "department": "Quality", "lastCal": "08/04/2026", "due": "08/03/2028", "technician": "Stephen Hein"}, {"id": "1 3/4-12 UN-2A", "name": "Thread Ring Gage GO/NOGO (SET) 1 3/4-12 UN-2A", "department": "Quality", "lastCal": "08/04/2026", "due": "08/03/2028", "technician": "Stephen Hein"}, {"id": "1-20 UNEF 2A", "name": "1-20 UNEF 2A", "department": "Quality", "lastCal": "08/24/2026", "due": "08/23/2028", "technician": "Stephen Hein"}, {"id": "10905567", "name": "Bracket Port QDV 1.25", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "11539095", "name": "Bracket Port QDV .3L", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "21353794", "name": "Receptacle Cover-Vent", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "21412781", "name": "Vent Cover ASM RH", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "3820189", "name": "Mounting", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "72801A", "name": "MOD III Connector Foot", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "14921003", "name": "Center Tube", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "20538358", "name": "Center Tube", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "14484632", "name": "Center Tube", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "14484691", "name": "Center Tube", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "1711160", "name": "Ice Shield Maci", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "AV12", "name": "Accuvac Cover Assy", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "56-01164-013", "name": "1/2\"SCH/40x.98", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "5586091", "name": "Support Leg", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "5561751", "name": "Support Leg", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "1011.04A", "name": "Back Bendment", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "4521R1323", "name": "Stiffener Guiding Cover", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "01710683", "name": "Terminal Cover", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "1761349", "name": "Slow Cover Spacer", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "1416661", "name": "FTG Adapter", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "10861576", "name": "Bracket Assy 1.2L", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "137080104", "name": "Bracket Lib Shroud", "department": "Final Inspection Fixture", "lastCal": "02/11/2026", "due": "02/10/2031", "technician": "Stephen Hein"}, {"id": "54211", "name": "Filler Plate", "department": "Final Inspection Fixture", "lastCal": "02/12/2026", "due": "02/11/2031", "technician": "Stephen Hein"}];
+const EMPLOYEE_ROSTER = [{"name": "Barrett, Brandon", "positionId": "33368974N", "department": ""}, {"name": "Hayes, Mark", "positionId": "72667480N", "department": ""}, {"name": "Hernandez, Arturo", "positionId": "47949455N", "department": ""}, {"name": "Nhouvannasack, Pooh", "positionId": "67516264N", "department": ""}, {"name": "Rhodes, Romano", "positionId": "07922171N", "department": ""}, {"name": "Rondan, Leonel", "positionId": "15740419N", "department": ""}, {"name": "Williams, John", "positionId": "46944756N", "department": ""}, {"name": "Adams, Jacob", "positionId": "A8O000416", "department": "000133-Tig Weld"}, {"name": "Adger, Torry", "positionId": "A8O000499", "department": "000111-Laser"}, {"name": "Arriaga, Isabel", "positionId": "A8O000647", "department": "000132-Mig Weld"}, {"name": "Ayers, Baba", "positionId": "A8O000619", "department": "000111-Laser"}, {"name": "Ayers, Tony", "positionId": "A8O000593", "department": "000111-Laser"}, {"name": "Bailey, Ozie Siddell", "positionId": "A8O000567", "department": "000122-Purchasing/Inventory"}, {"name": "Bailey, Rana", "positionId": "A8O000138", "department": "000137-Accounting"}, {"name": "Barnes, Richard Paul", "positionId": "A8O000657", "department": "000110-Sales"}, {"name": "Barrera, Magnolia", "positionId": "A8O000486", "department": "000121-Maintenance"}, {"name": "Berry, Darrell", "positionId": "A8O000408", "department": "000110-Sales"}, {"name": "Bishop, John", "positionId": "A8O000333", "department": "000117-Saw"}, {"name": "Black, Jason L", "positionId": "A8O000429", "department": "000106-Engineering"}, {"name": "Blalock, Willie", "positionId": "A8O000505", "department": "000111-Laser"}, {"name": "Bland, Jonathan", "positionId": "A8O000443", "department": "000136-Manual Machining"}, {"name": "Blocker, Ethan", "positionId": "A8O000469", "department": "000133-Tig Weld"}, {"name": "Brannon, Sean", "positionId": "A8O000363", "department": "000132-Mig Weld"}, {"name": "Bryant, Brian", "positionId": "A8O000059", "department": "000115-Production Management"}, {"name": "Buffington, Jacob Zachary", "positionId": "A8O000632", "department": "000121-Maintenance"}, {"name": "Bui, Quan", "positionId": "A8O000061", "department": "000133-Tig Weld"}, {"name": "Byrnes III, James", "positionId": "A8O000151", "department": "000131-Executive Leadership"}, {"name": "Cameron, David L", "positionId": "A8O000586", "department": "000132-Mig Weld"}, {"name": "Cantrell, Jonathan", "positionId": "A8O000514", "department": "000132-Mig Weld"}, {"name": "Cantrell, Lamar", "positionId": "A8O000152", "department": "000111-Laser"}, {"name": "Carson, Charles", "positionId": "A8O000203", "department": "000124-Grind and Polish"}, {"name": "Cervantes, Benjamin", "positionId": "A8O000065", "department": "000120-Press Brake"}, {"name": "Coleman, Joel S", "positionId": "A8O000066", "department": "000131-Executive Leadership"}, {"name": "Copeland, Nathanael", "positionId": "A8O000634", "department": "000132-Mig Weld"}, {"name": "Coronado, Rocio", "positionId": "A8O000067", "department": "000118-Deburr"}, {"name": "Crawford, Nicholas", "positionId": "A8O000394", "department": "000115-Production Management"}, {"name": "Davidson, Cody", "positionId": "A8O000387", "department": "000108-Quality Control"}, {"name": "DeForeest, Darryl", "positionId": "A8O000627", "department": "000132-Mig Weld"}, {"name": "Deveau, Scott Jason", "positionId": "A8O000548", "department": "000106-Engineering"}, {"name": "Digieso, Hunter", "positionId": "A8O000591", "department": "000132-Mig Weld"}, {"name": "Edwards, Davyion", "positionId": "A8O000566", "department": "000132-Mig Weld"}, {"name": "Esparza, Christopher", "positionId": "A8O000661", "department": "000122-Purchasing/Inventory"}, {"name": "Farris, Devin", "positionId": "A8O000498", "department": "000123-Assembly"}, {"name": "Franklin, Gerald", "positionId": "A8O000449", "department": "000132-Mig Weld"}, {"name": "Fry, Ronald C", "positionId": "A8O000077", "department": "000135-Roll"}, {"name": "Fulmer, Andrew", "positionId": "A8O000484", "department": "000106-Engineering"}, {"name": "Garcia, Marcos", "positionId": "A8O000623", "department": "000116-CNC Machining"}, {"name": "Giles, Austin", "positionId": "A8O000360", "department": "000106-Engineering"}, {"name": "Gomez, Orlando", "positionId": "A8O000379", "department": "000132-Mig Weld"}, {"name": "Greene, Israel", "positionId": "A8O000447", "department": "000115-Production Management"}, {"name": "Greene, Jody", "positionId": "A8O000084", "department": "000101-Cfo"}, {"name": "Greene, Rodney", "positionId": "A8O000085", "department": "000100-President"}, {"name": "Griffin, Danial", "positionId": "A8O000667", "department": "000132-Mig Weld"}, {"name": "Hamilton, Gina", "positionId": "A8O000087", "department": "000105-Customer Service"}, {"name": "Hein, Stephen", "positionId": "A8O000612", "department": "000108-Quality Control"}, {"name": "Her, Matthew", "positionId": "A8O000610", "department": "000116-CNC Machining"}, {"name": "Hogan, Wendy", "positionId": "A8O000582", "department": "000120-Press Brake"}, {"name": "Holbrook, William", "positionId": "A8O000190", "department": "000115-Production Management"}, {"name": "Holloway, Porter", "positionId": "A8O000659", "department": "000122-Purchasing/Inventory"}, {"name": "Jimenez, Juan", "positionId": "A8O000235", "department": "000119-Punch"}, {"name": "Jones, Cody", "positionId": "A8O000658", "department": "000116-CNC Machining"}, {"name": "Kasmarik, Deena", "positionId": "A8O000558", "department": "000132-Mig Weld"}, {"name": "Klein, Michael David", "positionId": "A8O000654", "department": "000116-CNC Machining"}, {"name": "Koch, Donald", "positionId": "A8O000668", "department": "000111-Laser"}, {"name": "Ladd, Barry", "positionId": "A8O000277", "department": "000113-Shipping"}, {"name": "Latham, Anthony", "positionId": "A8O000573", "department": "000133-Tig Weld"}, {"name": "Le, Tiffani", "positionId": "A8O000459", "department": "000123-Assembly"}, {"name": "Ledford, Angel", "positionId": "A8O000115", "department": "000131-Executive Leadership"}, {"name": "Lovell, Cameron Scott", "positionId": "A8O000625", "department": "000132-Mig Weld"}, {"name": "Luviano, Alicia", "positionId": "A8O000096", "department": "000118-Deburr"}, {"name": "Martinez-Hernandez, Miguel", "positionId": "A8O000652", "department": "000121-Maintenance"}, {"name": "Mathis, Hunter", "positionId": "A8O000557", "department": "000132-Mig Weld"}, {"name": "Mejia, Hugo", "positionId": "A8O000480", "department": "000113-Shipping"}, {"name": "Montano, Meden", "positionId": "A8O000630", "department": "000121-Maintenance"}, {"name": "Nelson, Michael", "positionId": "A8O000649", "department": "000132-Mig Weld"}, {"name": "Nguyen, Robert", "positionId": "A8O000670", "department": "000116-CNC Machining"}, {"name": "Nichols, Beverly", "positionId": "A8O000669", "department": "000104-Human Resources"}, {"name": "Nickerson, Jake", "positionId": "A8O000646", "department": "000136-Manual Machining"}, {"name": "Norris, Ryan", "positionId": "A8O000638", "department": "000132-Mig Weld"}, {"name": "Partridge, Ian", "positionId": "A8O000660", "department": "000120-Press Brake"}, {"name": "Pearson, David", "positionId": "A8O000445", "department": "000116-CNC Machining"}, {"name": "Polacky, Tyler", "positionId": "A8O000662", "department": "000129-Material Handling"}, {"name": "Prater, Jeremie", "positionId": "A8O000419", "department": "000113-Shipping"}, {"name": "Reynolds, Kristopher", "positionId": "A8O000496", "department": "000120-Press Brake"}, {"name": "Richardson, Derek Jordon", "positionId": "A8O000583", "department": "000120-Press Brake"}, {"name": "Riederer, Kyle", "positionId": "A8O000373", "department": "000133-Tig Weld"}, {"name": "Robertson, Joe", "positionId": "A8O000111", "department": "000105-Customer Service"}, {"name": "Roman Sandoval, Ubaldo", "positionId": "A8O000562", "department": "000124-Grind and Polish"}, {"name": "Samples, Christian", "positionId": "A8O000364", "department": "000118-Deburr"}, {"name": "Santiago, Abimael Colon", "positionId": "A8O000544", "department": "000132-Mig Weld"}, {"name": "Sheets, David J", "positionId": "A8O000116", "department": "PRODMH-000138 - Production MH"}, {"name": "Soto, Brando", "positionId": "A8O000664", "department": "000116-CNC Machining"}, {"name": "Spencer, James M", "positionId": "A8O000536", "department": "000121-Maintenance"}, {"name": "Ta, Quoc", "positionId": "A8O000665", "department": "000116-CNC Machining"}, {"name": "Thomas, Michael", "positionId": "A8O000420", "department": "000106-Engineering"}, {"name": "Tinsley, Bryan", "positionId": "A8O000127", "department": "000120-Press Brake"}, {"name": "Tran, Thien", "positionId": "A8O000339", "department": "000111-Laser"}, {"name": "Tran, Vanuyen", "positionId": "A8O000516", "department": "000116-CNC Machining"}, {"name": "Truelove, Charlie William", "positionId": "A8O000565", "department": "000136-Manual Machining"}, {"name": "Turner, Douglas J", "positionId": "A8O000489", "department": "000115-Production Management"}, {"name": "Varga, Shane", "positionId": "A8O000553", "department": "000116-CNC Machining"}, {"name": "Vasquez, Andrew", "positionId": "A8O000512", "department": "000133-Tig Weld"}, {"name": "Venegas, Luis G", "positionId": "A8O000481", "department": "000123-Assembly"}, {"name": "Villacorta, Geovanny", "positionId": "A8O000493", "department": "000133-Tig Weld"}, {"name": "Walley, Peron", "positionId": "A8O000176", "department": "000116-CNC Machining"}, {"name": "Westmoreland, Christopher Scott", "positionId": "A8O000633", "department": "000122-Purchasing/Inventory"}, {"name": "Williams, Maurice", "positionId": "A8O000663", "department": "000126-Safety"}, {"name": "Wood, Jeffrey", "positionId": "A8O000403", "department": "000131-Executive Leadership"}, {"name": "Wright, Kevin Theo", "positionId": "A8O000592", "department": "000121-Maintenance"}, {"name": "Xiong, Chue", "positionId": "A8O000359", "department": "000120-Press Brake"}, {"name": "Youngblood, Dan", "positionId": "A8O000666", "department": "000117-Saw"}, {"name": "Report Totals:", "positionId": "Count Of Employees In Report:111", "department": ""}];
+const STORAGE_KEY="qcGaugeKioskState_v2";
+
+const ADMIN_PIN_KEY="qcGaugeAdminPin_v1";
+const DEFAULT_ADMIN_PIN="0425";
+let adminUnlocked=false;
+function getAdminPin(){return localStorage.getItem(ADMIN_PIN_KEY)||DEFAULT_ADMIN_PIN;}
+function lockAdmin(){adminUnlocked=false;show("home");}
+function adminMessage(el,text,ok){el.className="message "+(ok?"ok":"err");el.textContent=text;}
+
+const defaultState={gaugeMeta:{},gaugeUpdates:{},addedGauges:[],employees:["Barrett, Brandon", "Hayes, Mark", "Hernandez, Arturo", "Nhouvannasack, Pooh", "Rhodes, Romano", "Rondan, Leonel", "Williams, John", "Adams, Jacob", "Adger, Torry", "Arriaga, Isabel", "Ayers, Baba", "Ayers, Tony", "Bailey, Ozie Siddell", "Bailey, Rana", "Barnes, Richard Paul", "Barrera, Magnolia", "Berry, Darrell", "Bishop, John", "Black, Jason L", "Blalock, Willie", "Bland, Jonathan", "Blocker, Ethan", "Brannon, Sean", "Bryant, Brian", "Buffington, Jacob Zachary", "Bui, Quan", "Byrnes III, James", "Cameron, David L", "Cantrell, Jonathan", "Cantrell, Lamar", "Carson, Charles", "Cervantes, Benjamin", "Coleman, Joel S", "Copeland, Nathanael", "Coronado, Rocio", "Crawford, Nicholas", "Davidson, Cody", "DeForeest, Darryl", "Deveau, Scott Jason", "Digieso, Hunter", "Edwards, Davyion", "Esparza, Christopher", "Farris, Devin", "Franklin, Gerald", "Fry, Ronald C", "Fulmer, Andrew", "Garcia, Marcos", "Giles, Austin", "Gomez, Orlando", "Greene, Israel", "Greene, Jody", "Greene, Rodney", "Griffin, Danial", "Hamilton, Gina", "Hein, Stephen", "Her, Matthew", "Hogan, Wendy", "Holbrook, William", "Holloway, Porter", "Jimenez, Juan", "Jones, Cody", "Kasmarik, Deena", "Klein, Michael David", "Koch, Donald", "Ladd, Barry", "Latham, Anthony", "Le, Tiffani", "Ledford, Angel", "Lovell, Cameron Scott", "Luviano, Alicia", "Martinez-Hernandez, Miguel", "Mathis, Hunter", "Mejia, Hugo", "Montano, Meden", "Nelson, Michael", "Nguyen, Robert", "Nichols, Beverly", "Nickerson, Jake", "Norris, Ryan", "Partridge, Ian", "Pearson, David", "Polacky, Tyler", "Prater, Jeremie", "Reynolds, Kristopher", "Richardson, Derek Jordon", "Riederer, Kyle", "Robertson, Joe", "Roman Sandoval, Ubaldo", "Samples, Christian", "Santiago, Abimael Colon", "Sheets, David J", "Soto, Brando", "Spencer, James M", "Ta, Quoc", "Thomas, Michael", "Tinsley, Bryan", "Tran, Thien", "Tran, Vanuyen", "Truelove, Charlie William", "Turner, Douglas J", "Varga, Shane", "Vasquez, Andrew", "Venegas, Luis G", "Villacorta, Geovanny", "Walley, Peron", "Westmoreland, Christopher Scott", "Williams, Maurice", "Wood, Jeffrey", "Wright, Kevin Theo", "Xiong, Chue", "Youngblood, Dan", "Report Totals:"],transactions:[]};
+let state=loadState();
+GAUGES.forEach(g=>{g.id=normalizeGaugeId(g.id);});
+applyImportedGaugeState();
+
+
+function applyImportedGaugeState(){
+  if(!state) return;
+  const updates=state.gaugeUpdates||{};
+  GAUGES.forEach(g=>{
+    const u=updates[g.id];
+    if(u) Object.assign(g,u);
+  });
+  (state.addedGauges||[]).forEach(saved=>{
+    if(!GAUGES.some(g=>g.id===saved.id)) GAUGES.push({...saved});
+  });
+}
+
+function normalizeGaugeId(v){
+  return String(v||"").trim().toUpperCase().replace(/\s+/g," ");
+}
+
+function normHeader(v){
+  return String(v||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+}
+function findField(row,names){
+  const keys=Object.keys(row);
+  for(const n of names){
+    const wanted=normHeader(n);
+    const k=keys.find(x=>normHeader(x)===wanted);
+    if(k!==undefined) return row[k];
+  }
+  return "";
+}
+function cleanImportValue(v){return v===null||v===undefined?"":String(v).trim();}
+function importRowToGauge(row){
+  const id=normalizeGaugeId(findField(row,["Gauge ID","Gage ID","Gauge Number","Gage Number","Gauge #","Gage #","ID"]));
+  if(!id) return null;
+  return {
+    id,
+    name:cleanImportValue(findField(row,["Gauge Name","Gage Name","Description","Gauge Description","Gage Description"])),
+    department:cleanImportValue(findField(row,["Department","Dept"])),
+    lastCal:cleanImportValue(findField(row,["Last Calibration","Last Cal","Calibration Date","Last Calibration Date"])),
+    due:cleanImportValue(findField(row,["Planned Calibration","Calibration Due","Due Date","Next Calibration","Next Calibration Date"])),
+    technician:cleanImportValue(findField(row,["Technician","Calibration Technician","Cal Technician"])),
+    category:cleanImportValue(findField(row,["Category","Gauge Type","Gage Type"])),
+    location:cleanImportValue(findField(row,["Storage Location","Location","Gauge Location","Gage Location"]))
+  };
+}
+function changedGaugeFields(current,incoming){
+  const fields=["name","department","lastCal","due","technician"];
+  const changes={};
+  fields.forEach(f=>{if(incoming[f]!==""&&String(current[f]||"")!==incoming[f])changes[f]=incoming[f];});
+  return changes;
+}
+let pendingGaugeImport=null;
+async function readGaugeImportFile(file){
+  const ext=(file.name.split(".").pop()||"").toLowerCase();
+  if(ext==="csv"){
+    const csv=await file.text();
+    if(window.XLSX){
+      const wb=XLSX.read(csv,{type:"string"});
+      return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:"",raw:false});
+    }
+    const lines=csv.split(/\r?\n/).filter(Boolean);
+    if(!lines.length)return [];
+    const parseLine=line=>{const out=[];let cur="",q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){cur+='"';i++;}else q=!q;}else if(ch===","&&!q){out.push(cur);cur="";}else cur+=ch;}out.push(cur);return out;};
+    const headers=parseLine(lines[0]);
+    return lines.slice(1).map(line=>{const vals=parseLine(line),o={};headers.forEach((h,i)=>o[h]=vals[i]||"");return o;});
+  }
+  if(!window.XLSX) throw new Error("Excel import needs an internet connection the first time so the Excel reader can load. You can also save the sheet as CSV and import it offline.");
+  const buf=await file.arrayBuffer();
+  const wb=XLSX.read(buf,{type:"array",cellDates:false});
+  const ws=wb.Sheets[wb.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(ws,{defval:"",raw:false});
+}
+function buildGaugeImportPreview(rows){
+  const parsed=rows.map(importRowToGauge).filter(Boolean).filter(g=>g.id.toLowerCase()!=="page:");
+  const seen=new Set(), unique=[];
+  parsed.forEach(g=>{const k=normalizeGaugeId(g.id);if(!seen.has(k)){seen.add(k);g.id=k;unique.push(g);}});
+  let matched=0, updated=0, added=0;
+  const actions=[];
+  unique.forEach(g=>{
+    const current=byId(g.id);
+    if(current){
+      matched++;
+      const changes=changedGaugeFields(current,g);
+      const metaChanges={};
+      if(g.category && gaugeCategory(current)!==g.category)metaChanges.category=g.category;
+      if(g.location && gaugeLocation(current)!==g.location)metaChanges.location=g.location;
+      const isUpdate=Object.keys(changes).length||Object.keys(metaChanges).length;
+      if(isUpdate)updated++;
+      actions.push({action:isUpdate?"UPDATE":"NO CHANGE",g,changes,metaChanges});
+    }else{
+      added++;
+      actions.push({action:"NEW",g,changes:{},metaChanges:{}});
+    }
+  });
+  return {rows:unique.length,matched,updated,added,actions};
+}
+function renderImportPreview(p){
+  document.getElementById("importRows").textContent=p.rows;
+  document.getElementById("importMatched").textContent=p.matched;
+  document.getElementById("importUpdated").textContent=p.updated;
+  document.getElementById("importNew").textContent=p.added;
+  document.getElementById("importSummary").style.display="grid";
+  document.getElementById("importPreviewWrap").style.display="block";
+  const body=document.getElementById("importPreviewBody");body.innerHTML="";
+  p.actions.slice(0,100).forEach(x=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><strong>${x.action}</strong></td><td>${x.g.id}</td><td>${x.g.name||""}</td><td>${x.g.department||""}</td><td>${x.g.lastCal||""}</td><td>${x.g.due||""}</td><td>${x.g.technician||""}</td>`;
+    body.appendChild(tr);
+  });
+}
+function applyGaugeImportData(p){
+  p.actions.forEach(x=>{
+    if(x.action==="NEW"){
+      const ng={
+        id:x.g.id,name:x.g.name||"",department:x.g.department||"",lastCal:x.g.lastCal||"",
+        due:x.g.due||"",technician:x.g.technician||""
+      };
+      GAUGES.push(ng);
+      state.addedGauges.push({...ng});
+      if(x.g.category||x.g.location){
+        state.gaugeMeta[x.g.id]={...(state.gaugeMeta[x.g.id]||{})};
+        if(x.g.category)state.gaugeMeta[x.g.id].category=x.g.category;
+        if(x.g.location)state.gaugeMeta[x.g.id].location=x.g.location;
+      }
+    }else if(x.action==="UPDATE"){
+      const current=byId(x.g.id);
+      Object.assign(current,x.changes);
+      state.gaugeUpdates[x.g.id]={...(state.gaugeUpdates[x.g.id]||{}),...x.changes};
+      if(Object.keys(x.metaChanges).length){
+        state.gaugeMeta[x.g.id]={...(state.gaugeMeta[x.g.id]||{}),...x.metaChanges};
+      }
+    }
+  });
+  saveState();
+  refreshAll();
+}
+
+function loadState(){
+  try{
+    const x=JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if(x&&Array.isArray(x.transactions)&&Array.isArray(x.employees)){if(!x.gaugeMeta)x.gaugeMeta={};if(!x.gaugeUpdates)x.gaugeUpdates={};if(!Array.isArray(x.addedGauges))x.addedGauges=[];return x;}return structuredClone(defaultState);
+  }catch(e){return structuredClone(defaultState)}
+}
+function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));queueCloudSave();}
+const SUPABASE_URL="https://jphnhyyyqpniofezeaww.supabase.co";
+const SUPABASE_KEY="sb_publishable_lc5_BCoUZq8C3skG7M14Rw_noSW7Vrz";
+let cloudReady=false,cloudSaving=false,cloudTimer=null,cloudLoading=false;
+function cloudHeaders(extra={}){return {"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json",...extra}}
+function cloudStatus(t,ok=true){const e=document.getElementById("cloudStatus");if(e){e.textContent=t;e.style.color=ok?"#176b2c":"#9b1c1c"}}
+function queueCloudSave(){if(cloudLoading)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(saveCloudState,250)}
+async function saveCloudState(){
+ if(cloudSaving)return;cloudSaving=true;
+ try{
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/qc_gage_app_state?id=eq.1`,{
+   method:"PATCH",headers:cloudHeaders({"Prefer":"return=minimal"}),
+   body:JSON.stringify({state_json:state,updated_at:new Date().toISOString()})
+  });
+  if(!r.ok)throw new Error(await r.text());
+  cloudReady=true;cloudStatus("Shared QC database connected ✓",true);
+ }catch(e){cloudStatus("Cloud save failed — local copy retained",false);console.error(e)}
+ finally{cloudSaving=false}
+}
+async function loadCloudState(){
+ try{
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/qc_gage_app_state?id=eq.1&select=state_json,updated_at`,{headers:cloudHeaders()});
+  if(!r.ok)throw new Error(await r.text());
+  const a=await r.json();
+  if(a[0]&&a[0].state_json){
+   cloudLoading=true;
+   const x=a[0].state_json;
+   if(x&&Array.isArray(x.transactions)&&Array.isArray(x.employees)){
+    if(!x.gaugeMeta)x.gaugeMeta={};if(!x.gaugeUpdates)x.gaugeUpdates={};if(!Array.isArray(x.addedGauges))x.addedGauges=[];
+    state=x;localStorage.setItem(STORAGE_KEY,JSON.stringify(state));refreshAll();
+   }
+   cloudLoading=false;
+  }
+  cloudReady=true;cloudStatus("Shared QC database connected ✓",true);
+ }catch(e){cloudLoading=false;cloudStatus("Cloud unavailable — using this device's saved copy",false);console.error(e)}
+}
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0,0);
+  refreshAll();
+}
+function nowIso(){return new Date().toISOString();}
+function fmt(ts){return new Date(ts).toLocaleString();}
+function lastAction(gid){
+  for(let i=state.transactions.length-1;i>=0;i--) if(normalizeGaugeId(state.transactions[i].gaugeId)===normalizeGaugeId(gid)) return state.transactions[i].action;
+  return null;
+}
+function isOut(gid){return lastAction(gid)==="CHECK OUT";}
+function availableGauges(){return GAUGES.filter(g=>!isOut(g.id));}
+function outGauges(){return GAUGES.filter(g=>isOut(g.id));}
+function byId(id){const n=normalizeGaugeId(id);return GAUGES.find(g=>normalizeGaugeId(g.id)===n);}
+
+const GAUGE_CATEGORIES=[
+  "Pin Gage","Thread Plug Gage","Thread Ring Gage","Micrometer","Caliper",
+  "Height Gage","Bore Gage","Indicator","Surface Roughness","Fixture",
+  "Torque Tool","Scale","Weld Equipment","Other"
+];
+function inferredCategory(g){
+  const t=(g.name||"").toLowerCase();
+  if(t.includes("pin")&&(t.includes("gage")||t.includes("gauge")))return "Pin Gage";
+  if(t.includes("thread plug")||t.includes("plug gage")||t.includes("plug gauge"))return "Thread Plug Gage";
+  if(t.includes("ring gage")||t.includes("ring gauge"))return "Thread Ring Gage";
+  if(t.includes("micrometer"))return "Micrometer";
+  if(t.includes("caliper"))return "Caliper";
+  if(t.includes("height gage")||t.includes("height gauge"))return "Height Gage";
+  if(t.includes("bore"))return "Bore Gage";
+  if(t.includes("indicator"))return "Indicator";
+  if(t.includes("roughness")||t.includes("surface finish"))return "Surface Roughness";
+  if(t.includes("fixture"))return "Fixture";
+  if(t.includes("torque"))return "Torque Tool";
+  if(t.includes("scale"))return "Scale";
+  if(t.includes("power source")||t.includes("wire feeder")||t.includes("weld"))return "Weld Equipment";
+  return "Other";
+}
+function metaFor(gid){
+  if(!state.gaugeMeta)state.gaugeMeta={};
+  if(!state.gaugeMeta[gid])state.gaugeMeta[gid]={};
+  return state.gaugeMeta[gid];
+}
+function gaugeCategory(g){return metaFor(g.id).category||inferredCategory(g);}
+function gaugeLocation(g){return metaFor(g.id).location||"";}
+
+
+function parseMDY(s){
+  if(!s) return null;
+  const p=s.split("/");
+  if(p.length!==3) return null;
+  const d=new Date(+p[2],+p[0]-1,+p[1],23,59,59);
+  return isNaN(d)?null:d;
+}
+function calStatus(g){
+  const d=parseMDY(g.due);
+  if(!d) return {key:"none",label:"No Date",days:null};
+  const today=new Date(); today.setHours(0,0,0,0);
+  const diff=Math.ceil((d-today)/86400000);
+  if(diff<0) return {key:"past",label:"PAST DUE",days:diff};
+  if(diff<=30) return {key:"soon",label:`DUE IN ${diff} DAY${diff===1?"":"S"}`,days:diff};
+  return {key:"ok",label:"CURRENT",days:diff};
+}
+let currentCalFilter="past";
+
+function categoryOptions(selected){
+  return GAUGE_CATEGORIES.map(c=>`<option ${c===selected?"selected":""}>${c}</option>`).join("");
+}
+function renderGaugeSetup(){
+  const body=document.getElementById("setupBody"); if(!body)return;
+  const q=(document.getElementById("setupSearch")?.value||"").toLowerCase();
+  body.innerHTML="";
+  GAUGES.filter(g=>`${g.id} ${g.name} ${g.department}`.toLowerCase().includes(q)).forEach(g=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${g.id}</td><td>${g.name||""}</td>
+      <td><select class="setup-category" data-gauge="${g.id}">${categoryOptions(gaugeCategory(g))}</select></td>
+      <td><input class="setup-location" data-gauge="${g.id}" value="${(gaugeLocation(g)||"").replaceAll('"','&quot;')}" placeholder="Not set"></td>
+      <td>${g.due||""}</td>
+      <td><button class="btn primary save-gauge-meta" data-gauge="${g.id}" type="button">Save</button></td>`;
+    body.appendChild(tr);
+  });
+  body.querySelectorAll(".save-gauge-meta").forEach(b=>b.addEventListener("click",()=>{
+    if(!adminUnlocked){show("adminlogin");return;}
+    const gid=b.dataset.gauge;
+    const cat=body.querySelector(`.setup-category[data-gauge="${CSS.escape(gid)}"]`).value;
+    const loc=body.querySelector(`.setup-location[data-gauge="${CSS.escape(gid)}"]`).value.trim();
+    state.gaugeMeta[gid]={...(state.gaugeMeta[gid]||{}),category:cat,location:loc};
+    saveState();refreshAll();b.textContent="Saved";setTimeout(()=>b.textContent="Save",700);
+  }));
+}
+
+function renderCalibration(filter=currentCalFilter){
+  currentCalFilter=filter;
+  const body=document.getElementById("calBody");
+  if(!body) return;
+  body.innerHTML="";
+  const items=GAUGES.map(g=>({g,s:calStatus(g)})).filter(x=>{
+    if(filter==="past") return x.s.key==="past";
+    if(filter==="soon") return x.s.key==="soon";
+    if(filter==="all") return x.s.key!=="none";
+    return true;
+  }).sort((a,b)=>{
+    const da=parseMDY(a.g.due), db=parseMDY(b.g.due);
+    return (da?.getTime()||Infinity)-(db?.getTime()||Infinity);
+  });
+  items.forEach(({g,s})=>{
+    const tr=document.createElement("tr");
+    const cls=s.key==="past"?"over":s.key==="soon"?"out":"in";
+    tr.innerHTML=`<td><span class="badge ${cls}">${s.label}</span></td>
+      <td>${g.id}</td><td>${g.name||""}</td><td>${gaugeCategory(g)}</td><td>${gaugeLocation(g)||"Not set"}</td><td>${g.department||""}</td>
+      <td>${g.lastCal||""}</td><td>${g.due||""}</td><td>${g.technician||""}</td>`;
+    body.appendChild(tr);
+  });
+  const all=GAUGES.map(g=>calStatus(g));
+  document.getElementById("calPastCount").textContent=all.filter(s=>s.key==="past").length;
+  document.getElementById("calSoonCount").textContent=all.filter(s=>s.key==="soon").length;
+  document.getElementById("calTotalCount").textContent=all.filter(s=>s.key!=="none").length;
+}
+
+function duePast(g){
+  if(!g.due) return false;
+  const parts=g.due.split("/");
+  if(parts.length!==3) return false;
+  const d=new Date(+parts[2],+parts[0]-1,+parts[1],23,59,59);
+  return d < new Date();
+}
+function gaugeLabel(g){return `${g.id} — ${g.name}${g.department?` [${g.department}]`:""}`;}
+function filtered(list,q){
+  q=(q||"").trim().toLowerCase();
+  if(!q) return list;
+  return list.filter(g=>`${g.id} ${g.name} ${g.department}`.toLowerCase().includes(q));
+}
+function fillGaugeSelect(sel,list,q){
+  const current=sel.value;
+  sel.innerHTML='<option value="">Select gauge...</option>';
+  filtered(list,q).forEach(g=>{
+    const o=document.createElement("option"); o.value=g.id; o.textContent=gaugeLabel(g); sel.appendChild(o);
+  });
+  if([...sel.options].some(o=>o.value===current)) sel.value=current;
+}
+function fillEmployees(){
+  ["outEmployee","inEmployee"].forEach(id=>{
+    const s=document.getElementById(id), cur=s.value;
+    s.innerHTML='<option value="">Select employee...</option>';
+    state.employees.forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;s.appendChild(o)});
+    if([...s.options].some(o=>o.value===cur)) s.value=cur;
+  });
+}
+function infoBox(el,g){
+  if(!g){el.style.display="none";el.textContent="";return}
+  let status=duePast(g)?"Calibration PAST DUE":`Calibration due: ${g.due||"Not listed"}`;
+  el.innerHTML=`<strong>${g.id}</strong> — ${g.name}<br>Category: ${gaugeCategory(g)} · Location: ${gaugeLocation(g)||"Not set"}<br>Department: ${g.department||"—"} · ${status}`;
+  el.style.display="block";
+}
+
+function refreshAdminStats(){
+  const p=document.getElementById("adminPastDueCount"); if(!p)return;
+  const statuses=GAUGES.map(g=>calStatus(g));
+  p.textContent=statuses.filter(s=>s.key==="past").length;
+  document.getElementById("adminDueSoonCount").textContent=statuses.filter(s=>s.key==="soon").length;
+  document.getElementById("adminCheckedOutCount").textContent=outGauges().length;
+  document.getElementById("adminMissingLocationCount").textContent=GAUGES.filter(g=>!gaugeLocation(g)).length;
+}
+
+function refreshStats(){
+  document.getElementById("totalCount").textContent=GAUGES.length;
+  const out=outGauges().length;
+  document.getElementById("outCount").textContent=out;
+  document.getElementById("availCount").textContent=GAUGES.length-out;
+  const employeePastDue=document.getElementById("pastDueCount"); if(employeePastDue) employeePastDue.textContent=GAUGES.filter(duePast).length;
+}
+
+function latestTransactionFor(gid){
+  for(let i=state.transactions.length-1;i>=0;i--){
+    if(normalizeGaugeId(state.transactions[i].gaugeId)===normalizeGaugeId(gid)) return state.transactions[i];
+  }
+  return null;
+}
+function renderCheckedOut(){
+  const body=document.getElementById("checkedOutBody");
+  if(!body) return;
+  body.innerHTML="";
+  const items=GAUGES.filter(g=>isOut(g.id)).map(g=>({g,t:latestTransactionFor(g.id)}))
+    .sort((a,b)=>(b.t?.time||"").localeCompare(a.t?.time||""));
+  document.getElementById("checkedOutReviewCount").textContent=items.length;
+  items.forEach(({g,t})=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${g.id}</td><td>${g.name||""}</td><td>${t?.employee||""}</td>
+      <td>${t?.department||g.department||""}</td><td>${t?.time?fmt(t.time):""}</td><td>${t?.notes||""}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+
+function refreshEmployeeHistory(){
+  const q=(document.getElementById("employeeHistorySearch")?.value||"").toLowerCase();
+  const body=document.getElementById("employeeHistoryBody");
+  if(!body) return;
+  body.innerHTML="";
+  state.transactions.slice().reverse().filter(t=>JSON.stringify(t).toLowerCase().includes(q)).forEach(t=>{
+    const g=byId(t.gaugeId)||{name:""};
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${fmt(t.time)}</td><td><span class="badge ${t.action==="CHECK OUT"?"out":"in"}">${t.action}</span></td>
+      <td>${t.gaugeId}</td><td>${g.name||""}</td><td>${t.employee||""}</td>
+      <td>${t.department||g.department||""}</td><td>${[t.condition,t.notes].filter(Boolean).join(" — ")}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+function refreshHistory(){
+  const q=(document.getElementById("historySearch").value||"").toLowerCase();
+  const body=document.getElementById("historyBody");body.innerHTML="";
+  state.transactions.slice().reverse().filter(t=>JSON.stringify(t).toLowerCase().includes(q)).forEach(t=>{
+    const g=byId(t.gaugeId)||{name:""};
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${fmt(t.time)}</td><td><span class="badge ${t.action==="CHECK OUT"?"out":"in"}">${t.action}</span></td>
+      <td>${t.gaugeId}</td><td>${g.name||""}</td><td>${t.employee||""}</td>
+      <td>${t.department||g.department||""}</td><td>${[t.condition,t.notes].filter(Boolean).join(" — ")}</td>`;
+    body.appendChild(tr);
+  });
+}
+function refreshEmployees(){
+  const box=document.getElementById("employeeList");box.innerHTML="";
+  state.employees.forEach((n,i)=>{
+    const b=document.createElement("button");b.className="btn";b.type="button";b.textContent=`${n} ×`;
+    b.title="Remove employee";b.addEventListener("click",()=>{
+      if(!adminUnlocked){show("adminlogin");return;}
+      if(state.employees.length===1){alert("Keep at least one employee in the list.");return}
+      state.employees.splice(i,1);saveState();refreshAll();
+    });box.appendChild(b);
+  });
+}
+function refreshAll(){
+  fillEmployees();
+  fillGaugeSelect(document.getElementById("outGauge"),availableGauges(),"");
+  fillGaugeSelect(document.getElementById("inGauge"),outGauges(),"");
+  refreshStats();refreshAdminStats();refreshHistory();refreshEmployeeHistory();refreshEmployees();renderCheckedOut();renderGaugeSetup();
+}
+function message(el,text,ok){
+  el.className="message "+(ok?"ok":"err");el.textContent=text;
+}
+document.getElementById("goOut").addEventListener("click",()=>{show("checkout");setTimeout(()=>document.getElementById("outScan").focus(),50)});
+document.getElementById("goIn").addEventListener("click",()=>{show("checkin");setTimeout(()=>document.getElementById("inScan").focus(),50)});
+document.querySelectorAll("[data-home]").forEach(b=>b.addEventListener("click",()=>show("home")));
+document.querySelectorAll(".cal-filter").forEach(b=>b.addEventListener("click",()=>renderCalibration(b.dataset.filter)));
+document.getElementById("printLabels").addEventListener("click",()=>{if(!adminUnlocked){show("adminlogin");return;}window.print();});
+document.getElementById("checkedOutCard").addEventListener("click",()=>{renderCheckedOut();show("checkedout")});
+document.getElementById("outGauge").addEventListener("change",e=>infoBox(document.getElementById("outInfo"),byId(e.target.value)));
+document.getElementById("inGauge").addEventListener("change",e=>infoBox(document.getElementById("inInfo"),byId(e.target.value)));
+document.getElementById("historySearch").addEventListener("input",refreshHistory);
+
+document.getElementById("outScan").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();processScan("out");}
+});
+document.getElementById("inScan").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();processScan("in");}
+});
+
+
+function employeeRecord(name){return EMPLOYEE_ROSTER.find(e=>e.name===name)||null;}
+document.getElementById("outEmployee").addEventListener("change",e=>{
+  const rec=employeeRecord(e.target.value);
+  if(rec && rec.department) document.getElementById("outDept").value=rec.department;
+});
+
+
+document.getElementById("checkoutForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const employee=document.getElementById("outEmployee").value;
+  const gid=normalizeGaugeId(document.getElementById("outGauge").value);
+  const msg=document.getElementById("outMsg");
+  if(!employee||!gid){message(msg,"Select an employee and gauge.",false);return}
+  if(isOut(gid)){message(msg,"That gauge is already checked out.",false);refreshAll();return}
+  const gauge=byId(gid);
+  if(gauge&&duePast(gauge)){message(msg,`${gid} is PAST DUE for calibration. Checkout is blocked. Contact QC.`,false);return}
+  state.transactions.push({
+    time:nowIso(),action:"CHECK OUT",gaugeId:gid,employee,
+    department:document.getElementById("outDept").value.trim()||byId(gid).department,
+    notes:document.getElementById("outNotes").value.trim()
+  });
+  saveState();
+  message(msg,`${gid} checked out to ${employee}.`,true);
+  e.target.reset(); infoBox(document.getElementById("outInfo"),null); refreshAll();
+});
+
+document.getElementById("checkinForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const employee=document.getElementById("inEmployee").value;
+  const gid=normalizeGaugeId(document.getElementById("inGauge").value);
+  const msg=document.getElementById("inMsg");
+  if(!employee||!gid){message(msg,"Select an employee and gauge.",false);return}
+  if(!isOut(gid)){message(msg,"That gauge is not currently checked out.",false);refreshAll();return}
+  state.transactions.push({
+    time:nowIso(),action:"CHECK IN",gaugeId:gid,employee,
+    condition:document.getElementById("inCondition").value,
+    notes:document.getElementById("inNotes").value.trim()
+  });
+  saveState();
+  const loc=gaugeLocation(byId(gid));message(msg,`${gid} checked in by ${employee}.${loc?` Return to: ${loc}.`:" Storage location not set — contact QC."}`,true);
+  e.target.reset(); infoBox(document.getElementById("inInfo"),null); refreshAll();
+});
+
+document.getElementById("addEmployee").addEventListener("click",()=>{
+  if(!adminUnlocked){show("adminlogin");return;}
+  const el=document.getElementById("newEmployee"), n=el.value.trim();
+  if(!n) return;
+  if(!state.employees.includes(n)) state.employees.push(n);
+  el.value="";saveState();refreshAll();
+});
+document.getElementById("historyClearBtn").addEventListener("click",()=>{
+  if(!adminUnlocked){show("adminlogin");return;}
+  if(confirm("Delete ALL transaction history? This cannot be undone unless you have a backup.")){
+    state.transactions=[];
+    saveState();
+    refreshAll();
+    alert("Transaction history deleted.");
+  }
+});
+function download(name,text,type){
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+document.getElementById("adminExportBtn").addEventListener("click",()=>{
+  const rows=[["DateTime","Action","GaugeID","GaugeDescription","Employee","Department","Condition","Notes"]];
+  state.transactions.forEach(t=>{
+    const g=byId(t.gaugeId)||{};
+    rows.push([fmt(t.time),t.action,t.gaugeId,g.name||"",t.employee||"",t.department||g.department||"",t.condition||"",t.notes||""]);
+  });
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
+  download("QC_Gauge_Transactions.csv",csv,"text/csv");
+});
+document.getElementById("adminBackupBtn").addEventListener("click",()=>{
+  download("QC_Gauge_Kiosk_Backup.json",JSON.stringify(state,null,2),"application/json");
+});
+document.getElementById("adminRestoreFile").addEventListener("change",async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  try{
+    const x=JSON.parse(await f.text());
+    if(!Array.isArray(x.transactions)||!Array.isArray(x.employees)) throw new Error();
+    state=x;saveState();refreshAll();alert("Backup restored.");
+  }catch(err){alert("That backup file is not valid.");}
+  e.target.value="";
+});
+
+
+document.getElementById("adminModeBtn").addEventListener("click",()=>show(adminUnlocked?"adminhome":"adminlogin"));
+document.getElementById("adminLoginForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const msg=document.getElementById("adminLoginMsg");
+  if(document.getElementById("adminPinInput").value===getAdminPin()){
+    adminUnlocked=true;e.target.reset();msg.className="message";show("adminhome");
+  }else{adminMessage(msg,"Incorrect PIN.",false);document.getElementById("adminPinInput").select();}
+});
+document.getElementById("exitAdminBtn").addEventListener("click",lockAdmin);
+document.getElementById("employeeHistoryBtn").addEventListener("click",()=>{renderCheckedOut();show("checkedout")});
+document.getElementById("employeeTransactionsBtn").addEventListener("click",()=>{refreshEmployeeHistory();show("employeehistory")});
+document.getElementById("employeeHistorySearch").addEventListener("input",refreshEmployeeHistory);
+document.getElementById("adminPastDueCard").addEventListener("click",()=>{if(adminUnlocked){renderCalibration("past");show("calibration")}else show("adminlogin")});
+document.getElementById("adminDueSoonCard").addEventListener("click",()=>{if(adminUnlocked){renderCalibration("soon");show("calibration")}else show("adminlogin")});
+document.getElementById("adminCheckedOutCard").addEventListener("click",()=>{if(adminUnlocked){renderCheckedOut();show("checkedout")}else show("adminlogin")});
+document.getElementById("adminMissingLocationCard").addEventListener("click",()=>{if(adminUnlocked){document.getElementById("setupSearch").value="";renderGaugeSetup();show("gaugesetup")}else show("adminlogin")});
+document.getElementById("adminInventoryCard").addEventListener("click",()=>{if(adminUnlocked){renderGaugeSetup();show("gaugesetup")}else show("adminlogin")});
+document.getElementById("adminImportCard").addEventListener("click",()=>{if(adminUnlocked)show("gaugeimport");else show("adminlogin")});
+document.getElementById("adminDocsCard").addEventListener("click",()=>{if(adminUnlocked){renderDocuments();show("documents")}else show("adminlogin")});
+document.getElementById("adminLabelsCard").addEventListener("click",()=>{if(adminUnlocked){renderBarcodeLabels();show("labels")}else show("adminlogin")});
+document.getElementById("adminEmployeesCard").addEventListener("click",()=>{if(adminUnlocked)show("settings");else show("adminlogin")});
+document.getElementById("adminHistoryCard").addEventListener("click",()=>{if(adminUnlocked){refreshHistory();show("history")}else show("adminlogin")});
+document.getElementById("changePinBtn").addEventListener("click",()=>show(adminUnlocked?"changepin":"adminlogin"));
+document.getElementById("cancelPinChange").addEventListener("click",()=>show("adminhome"));
+document.getElementById("changePinForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const msg=document.getElementById("pinChangeMsg");
+  const cur=document.getElementById("currentPin").value, np=document.getElementById("newPin").value, cp=document.getElementById("confirmPin").value;
+  if(cur!==getAdminPin()){adminMessage(msg,"Current PIN is incorrect.",false);return}
+  if(np.length<4){adminMessage(msg,"New PIN must be at least 4 digits.",false);return}
+  if(np!==cp){adminMessage(msg,"New PIN entries do not match.",false);return}
+  localStorage.setItem(ADMIN_PIN_KEY,np);e.target.reset();adminMessage(msg,"Admin PIN changed.",true);setTimeout(()=>show("adminhome"),600);
+});
+document.querySelectorAll(".admin-back").forEach(b=>b.addEventListener("click",()=>show(adminUnlocked?"adminhome":"adminlogin")));
+
+
+
+document.getElementById("previewGaugeImport").addEventListener("click",async()=>{
+  if(!adminUnlocked){show("adminlogin");return;}
+  const file=document.getElementById("gaugeImportFile").files[0];
+  const m=document.getElementById("gaugeImportMsg");
+  if(!file){message(m,"Choose an Excel or CSV file first.",false);return;}
+  try{
+    const rows=await readGaugeImportFile(file);
+    pendingGaugeImport=buildGaugeImportPreview(rows);
+    renderImportPreview(pendingGaugeImport);
+    document.getElementById("applyGaugeImport").disabled=false;
+    message(m,`Preview ready: ${pendingGaugeImport.updated} existing gauges will update and ${pendingGaugeImport.added} new gauges will be added. Nothing has been changed yet.`,true);
+  }catch(e){
+    pendingGaugeImport=null;
+    document.getElementById("applyGaugeImport").disabled=true;
+    message(m,e.message||"Could not read that spreadsheet.",false);
+  }
+});
+document.getElementById("applyGaugeImport").addEventListener("click",()=>{
+  if(!adminUnlocked){show("adminlogin");return;}
+  if(!pendingGaugeImport)return;
+  if(!confirm(`Apply ${pendingGaugeImport.updated} updates and add ${pendingGaugeImport.added} new gauges? Existing transaction history and documents will be preserved.`))return;
+  applyGaugeImportData(pendingGaugeImport);
+  message(document.getElementById("gaugeImportMsg"),`Gauge list updated successfully. ${pendingGaugeImport.updated} updated; ${pendingGaugeImport.added} added.`,true);
+  document.getElementById("applyGaugeImport").disabled=true;
+});
+
+document.getElementById("setupSearch").addEventListener("input",renderGaugeSetup);
+document.getElementById("uploadDocBtn").addEventListener("click",async()=>{
+  if(!adminUnlocked){show("adminlogin");return;}
+  const gid=document.getElementById("docGauge").value;
+  const file=document.getElementById("docFile").files[0];
+  const msg=document.getElementById("docMsg");
+  if(!gid||!file){message(msg,"Select a gauge and a document.",false);return;}
+  try{
+    await addGaugeDoc(gid,file);
+    document.getElementById("docFile").value="";
+    message(msg,`${file.name} saved to ${gid}.`,true);
+    await renderDocuments();
+  }catch(e){message(msg,"Could not save the document in this browser.",false);}
+});
+
+
+// iPad/iOS compatibility helpers
+(function(){
+  const isiPadLike = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if(isiPadLike){
+    document.documentElement.classList.add('ios-device');
+    document.querySelectorAll('button,.btn,.action,.card').forEach(el=>{
+      el.addEventListener('touchend', function(){}, {passive:true});
+    });
+  }
+})();
+
+setInterval(()=>document.getElementById("clock").textContent=new Date().toLocaleString(),1000);
+document.getElementById("clock").textContent=new Date().toLocaleString();
+refreshAll();
+</script>
+
+<script>
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(console.error));
+}
+
+loadCloudState();setInterval(()=>{if(!cloudSaving)loadCloudState()},15000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)loadCloudState()});
+</script>
+</body>
+</html>
