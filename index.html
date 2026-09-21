@@ -422,7 +422,7 @@ input,select,textarea{font-size:16px !important}
         <tbody id="importPreviewBody"></tbody>
       </table>
     </div>
-    <p class="stats-note">Recognized columns include Gauge/Gage ID or Number, Gauge/Gage Name or Description, Department, Last Calibration, Planned Calibration or Calibration Due, Technician, Category, and Storage Location.</p>
+    <p class="stats-note">Recognized columns include Gauge/Gage ID or Number, Gauge/Gage Name or Description, Department, Last Calibration, Planned Calibration or Calibration Due, Technician, Category, Storage Location, and Barcode.</p>
   </div>
 </section>
 
@@ -433,7 +433,7 @@ input,select,textarea{font-size:16px !important}
     <div class="field"><label>Search Gauge</label><input id="setupSearch" placeholder="Gauge ID, description, department..."></div>
     <div class="tablewrap" style="margin-top:14px">
       <table>
-        <thead><tr><th>Gauge ID</th><th>Description</th><th>Category</th><th>Storage Location</th><th>Calibration Due</th><th>Save</th></tr></thead>
+        <thead><tr><th>Gauge ID</th><th>Description</th><th>Category</th><th>Storage Location</th><th>Barcode</th><th>Calibration Due</th><th>Save</th></tr></thead>
         <tbody id="setupBody"></tbody>
       </table>
     </div>
@@ -621,7 +621,7 @@ function processScan(mode){
   const sel=document.getElementById(mode==="out"?"outGauge":"inGauge");
   const raw=normalizeGaugeId(scan.value);
   if(!raw) return;
-  const g=byId(raw);
+  const g=byScanValue(raw);
   if(!g){flashScan(scan,false);scan.select();return;}
   const valid=mode==="out"?(!isOut(g.id)&&!duePast(g)):isOut(g.id);
   if(!valid){flashScan(scan,false);scan.select();return;}
@@ -689,7 +689,8 @@ function importRowToGauge(row){
     due:cleanImportValue(findField(row,["Planned Calibration","Calibration Due","Due Date","Next Calibration","Next Calibration Date"])),
     technician:cleanImportValue(findField(row,["Technician","Calibration Technician","Cal Technician"])),
     category:cleanImportValue(findField(row,["Category","Gauge Type","Gage Type"])),
-    location:cleanImportValue(findField(row,["Storage Location","Location","Gauge Location","Gage Location"]))
+    location:cleanImportValue(findField(row,["Storage Location","Location","Gauge Location","Gage Location"])),
+    barcode:cleanImportValue(findField(row,["Barcode","Barcode ID","Barcode Number","Scanner Code"]))
   };
 }
 function changedGaugeFields(current,incoming){
@@ -733,6 +734,7 @@ function buildGaugeImportPreview(rows){
       const metaChanges={};
       if(g.category && gaugeCategory(current)!==g.category)metaChanges.category=g.category;
       if(g.location && gaugeLocation(current)!==g.location)metaChanges.location=g.location;
+      if(g.barcode && gaugeBarcode(current)!==g.barcode)metaChanges.barcode=g.barcode;
       const isUpdate=Object.keys(changes).length||Object.keys(metaChanges).length;
       if(isUpdate)updated++;
       actions.push({action:isUpdate?"UPDATE":"NO CHANGE",g,changes,metaChanges});
@@ -766,10 +768,11 @@ function applyGaugeImportData(p){
       };
       GAUGES.push(ng);
       state.addedGauges.push({...ng});
-      if(x.g.category||x.g.location){
+      if(x.g.category||x.g.location||x.g.barcode){
         state.gaugeMeta[x.g.id]={...(state.gaugeMeta[x.g.id]||{})};
         if(x.g.category)state.gaugeMeta[x.g.id].category=x.g.category;
         if(x.g.location)state.gaugeMeta[x.g.id].location=x.g.location;
+        if(x.g.barcode)state.gaugeMeta[x.g.id].barcode=x.g.barcode;
       }
     }else if(x.action==="UPDATE"){
       const current=byId(x.g.id);
@@ -843,6 +846,11 @@ function isOut(gid){return lastAction(gid)==="CHECK OUT";}
 function availableGauges(){return GAUGES.filter(g=>!isOut(g.id));}
 function outGauges(){return GAUGES.filter(g=>isOut(g.id));}
 function byId(id){const n=normalizeGaugeId(id);return GAUGES.find(g=>normalizeGaugeId(g.id)===n);}
+function gaugeBarcode(g){return (metaFor(g.id).barcode||"").trim();}
+function byScanValue(value){
+  const n=normalizeGaugeId(value);
+  return GAUGES.find(g=>normalizeGaugeId(g.id)===n || normalizeGaugeId(gaugeBarcode(g))===n);
+}
 
 const GAUGE_CATEGORIES=[
   "Pin Gage","Thread Plug Gage","Thread Ring Gage","Micrometer","Caliper",
@@ -900,11 +908,12 @@ function renderGaugeSetup(){
   const body=document.getElementById("setupBody"); if(!body)return;
   const q=(document.getElementById("setupSearch")?.value||"").toLowerCase();
   body.innerHTML="";
-  GAUGES.filter(g=>`${g.id} ${g.name} ${g.department}`.toLowerCase().includes(q)).forEach(g=>{
+  GAUGES.filter(g=>`${g.id} ${g.name} ${g.department} ${gaugeBarcode(g)}`.toLowerCase().includes(q)).forEach(g=>{
     const tr=document.createElement("tr");
     tr.innerHTML=`<td>${g.id}</td><td>${g.name||""}</td>
       <td><select class="setup-category" data-gauge="${g.id}">${categoryOptions(gaugeCategory(g))}</select></td>
       <td><input class="setup-location" data-gauge="${g.id}" value="${(gaugeLocation(g)||"").replaceAll('"','&quot;')}" placeholder="Not set"></td>
+      <td><input class="setup-barcode" data-gauge="${g.id}" value="${(gaugeBarcode(g)||"").replaceAll('"','&quot;')}" placeholder="Scan barcode"></td>
       <td>${g.due||""}</td>
       <td><button class="btn primary save-gauge-meta" data-gauge="${g.id}" type="button">Save</button></td>`;
     body.appendChild(tr);
@@ -914,7 +923,8 @@ function renderGaugeSetup(){
     const gid=b.dataset.gauge;
     const cat=body.querySelector(`.setup-category[data-gauge="${CSS.escape(gid)}"]`).value;
     const loc=body.querySelector(`.setup-location[data-gauge="${CSS.escape(gid)}"]`).value.trim();
-    state.gaugeMeta[gid]={...(state.gaugeMeta[gid]||{}),category:cat,location:loc};
+    const barcode=body.querySelector(`.setup-barcode[data-gauge="${CSS.escape(gid)}"]`).value.trim();
+    state.gaugeMeta[gid]={...(state.gaugeMeta[gid]||{}),category:cat,location:loc,barcode};
     saveState();refreshAll();b.textContent="Saved";setTimeout(()=>b.textContent="Save",700);
   }));
 }
@@ -1086,6 +1096,19 @@ document.getElementById("inScan").addEventListener("keydown",e=>{
   if(e.key==="Enter"){e.preventDefault();processScan("in");}
 });
 
+// iPad Bluetooth HID scanners type the barcode like a keyboard.
+// Auto-process a recognized code even if the scanner sends no Enter/Return.
+["out","in"].forEach(mode=>{
+  const scan=document.getElementById(mode==="out"?"outScan":"inScan");
+  let scanTimer=null;
+  scan.addEventListener("input",()=>{
+    clearTimeout(scanTimer);
+    scanTimer=setTimeout(()=>{
+      if(byScanValue(scan.value)) processScan(mode);
+    },120);
+  });
+});
+
 
 function employeeRecord(name){return EMPLOYEE_ROSTER.find(e=>e.name===name)||null;}
 document.getElementById("outEmployee").addEventListener("change",e=>{
@@ -1111,6 +1134,7 @@ document.getElementById("checkoutForm").addEventListener("submit",e=>{
   saveState();
   message(msg,`${gid} checked out to ${employee}.`,true);
   e.target.reset(); infoBox(document.getElementById("outInfo"),null); refreshAll();
+  setTimeout(()=>document.getElementById("outScan").focus(),50);
 });
 
 document.getElementById("checkinForm").addEventListener("submit",e=>{
@@ -1128,6 +1152,7 @@ document.getElementById("checkinForm").addEventListener("submit",e=>{
   saveState();
   const loc=gaugeLocation(byId(gid));message(msg,`${gid} checked in by ${employee}.${loc?` Return to: ${loc}.`:" Storage location not set — contact QC."}`,true);
   e.target.reset(); infoBox(document.getElementById("inInfo"),null); refreshAll();
+  setTimeout(()=>document.getElementById("inScan").focus(),50);
 });
 
 document.getElementById("addEmployee").addEventListener("click",()=>{
